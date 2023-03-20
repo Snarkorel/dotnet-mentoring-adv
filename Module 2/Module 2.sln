@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CartingService", "CartingSe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatalogService", "CatalogService\CatalogService.csproj", "{2B6DD38E-4A44-42D7-860D-987962462209}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatalogService.Data", "CatalogService.Data\CatalogService.Data.csproj", "{C618B1E8-BB71-49B6-BB3A-688203075705}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{2B6DD38E-4A44-42D7-860D-987962462209}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B6DD38E-4A44-42D7-860D-987962462209}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B6DD38E-4A44-42D7-860D-987962462209}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C618B1E8-BB71-49B6-BB3A-688203075705}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C618B1E8-BB71-49B6-BB3A-688203075705}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C618B1E8-BB71-49B6-BB3A-688203075705}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C618B1E8-BB71-49B6-BB3A-688203075705}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
