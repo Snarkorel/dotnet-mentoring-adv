@@ -1,4 +1,4 @@
-﻿namespace CatalogService.Data
+﻿namespace CatalogService.Data.Interfaces
 {
     public interface IDataProvider
     {
