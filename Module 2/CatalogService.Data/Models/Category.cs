@@ -7,8 +7,10 @@ namespace CatalogService.Data.Models
     {
         [Required]
         [MaxLength(50)]
+        [DataType(DataType.Text)]
         public string Name { get; set; }
 
+        [DataType(DataType.ImageUrl)]
         public string Image { get; set; }
 
         [ForeignKey("ParentCategory")]

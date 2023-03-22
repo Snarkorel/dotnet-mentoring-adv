@@ -7,10 +7,13 @@ namespace CatalogService.Data.Models
     {
         [Required]
         [MaxLength(50)]
+        [DataType(DataType.Text)]
         public string Name { get; set; }
 
+        [DataType(DataType.Html)]
         public string Description { get; set; }
 
+        [DataType(DataType.ImageUrl)]
         public string Image { get; set; }
 
         [Required]
@@ -20,6 +23,7 @@ namespace CatalogService.Data.Models
         public Category Category { get; set; }
 
         [Required]
+        [Column(TypeName = "money")]
         public decimal Price { get; set; }
 
         public uint Amount { get; set; }
