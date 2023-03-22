@@ -6,9 +6,9 @@ namespace CartingService.Infrastructure.LiteDB
 {
     internal class LiteDBDatabaseService<TEntity> : IDatabaseService<TEntity>
     {
-        private ILiteDatabase _database;
+        private readonly ILiteDatabase _database;
         //Let's imagine that we're taking this string from the config
-        private static string _connectionString = $"filename={Assembly.GetExecutingAssembly().Location}.LiteDb.db;journal=false";
+        private static readonly string _connectionString = $"filename={Assembly.GetExecutingAssembly().Location}.LiteDb.db;journal=false";
         private readonly ILiteCollection<TEntity> _collection;
 
         internal LiteDBDatabaseService()
