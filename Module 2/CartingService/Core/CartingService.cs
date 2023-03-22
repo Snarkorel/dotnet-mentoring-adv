@@ -8,16 +8,16 @@ namespace CartingService.Core
     {
         private Cart _cart;
         private readonly ICartItemRepository _repository;
-        
+
         //TODO: logging, exception processing (out of task's scope)
         private CartingService(ICartItemRepository repository)
         {
             _repository = repository;
         }
 
-        public CartingService(int cartId)
+        public void Initialize(int cartId)
         {
-            _cart = new Cart {Id = cartId};
+            _cart.Id = cartId;
         }
         
         public IEnumerable<CartItem> GetItems()
