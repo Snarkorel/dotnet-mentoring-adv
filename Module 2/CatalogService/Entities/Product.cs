@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CatalogService.Entities
+namespace CatalogService.Core.Entities
 {
     public class Product
     {

@@ -1,6 +1,6 @@
-﻿using CatalogService.Interfaces;
+﻿using CatalogService.Core.Interfaces;
 
-namespace CatalogService
+namespace CatalogService.Core
 {
     public class CatalogService : ICatalogService
     {
