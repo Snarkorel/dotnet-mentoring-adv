@@ -7,7 +7,7 @@ namespace CatalogService.Core.Entities
         [Required]
         public string Name { get; set; }
 
-        public string Image { get; set; }
+        public Uri Image { get; set; }
 
         public Category ParentCategory { get; set; }
     }
