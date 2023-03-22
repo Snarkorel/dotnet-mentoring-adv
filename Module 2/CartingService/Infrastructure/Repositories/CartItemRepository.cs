@@ -19,13 +19,12 @@ namespace CartingService.Infrastructure.Repositories
 
         public void Add(CartItem item)
         {
-            //TODO: constraints
             _dbService.Add(item);
         }
 
         public void Update(CartItem item)
         {
-            //constraints not in the scope of task
+            //constraints are not in the scope of task
             _dbService.Update(item);
         }
 
