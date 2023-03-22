@@ -3,11 +3,10 @@ using CartingService.Infrastructure.Interfaces;
 
 namespace CartingService.Infrastructure.Repositories
 {
-    internal class CartItemRepository : ICartItemRepository
+    public class CartItemRepository : ICartItemRepository
     {
         private readonly IDatabaseService<CartItem> _dbService;
-
-        //TODO: DI
+        
         public CartItemRepository(IDatabaseService<CartItem> dbService)
         {
             _dbService = dbService;
@@ -26,7 +25,7 @@ namespace CartingService.Infrastructure.Repositories
 
         public void Update(CartItem item)
         {
-            //TODO: constraints
+            //constraints not in the scope of task
             _dbService.Update(item);
         }
 

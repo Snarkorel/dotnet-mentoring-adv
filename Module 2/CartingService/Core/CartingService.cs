@@ -10,7 +10,7 @@ namespace CartingService.Core
         private readonly ICartItemRepository _repository;
 
         //TODO: logging, exception processing (out of task's scope)
-        private CartingService(ICartItemRepository repository)
+        public CartingService(ICartItemRepository repository)
         {
             _repository = repository;
         }

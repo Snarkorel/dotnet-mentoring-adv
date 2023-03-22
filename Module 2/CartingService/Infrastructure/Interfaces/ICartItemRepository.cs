@@ -2,7 +2,7 @@
 
 namespace CartingService.Infrastructure.Interfaces
 {
-    internal interface ICartItemRepository : IRepository
+    public interface ICartItemRepository : IRepository
     {
         IEnumerable<CartItem> GetItems();
 

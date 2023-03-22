@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace CartingService.Infrastructure.LiteDB
 {
-    internal class LiteDbDatabaseService<TEntity> : IDatabaseService<TEntity>
+    public class LiteDbDatabaseService<TEntity> : IDatabaseService<TEntity>
     {
         private readonly ILiteDatabase _database;
         //Let's imagine that we're taking this string from the config
