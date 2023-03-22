@@ -11,7 +11,7 @@ namespace CartingService.Infrastructure.LiteDB
         private static readonly string _connectionString = $"filename={Assembly.GetExecutingAssembly().Location}.LiteDb.db;journal=false";
         private readonly ILiteCollection<TEntity> _collection;
 
-        internal LiteDbDatabaseService()
+        public LiteDbDatabaseService()
         {
             _database = new LiteDatabase(_connectionString);
             _collection = _database.GetCollection<TEntity>();
