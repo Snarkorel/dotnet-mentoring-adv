@@ -5,6 +5,13 @@ namespace CartingService.Core
 {
     public class CartingService : ICartingService
     {
+        private Cart _cart;
+
+        public CartingService(int cartId)
+        {
+            _cart = new Cart {Id = cartId};
+        }
+        
         public IEnumerable<CartItem> GetItems()
         {
             throw new NotImplementedException();
