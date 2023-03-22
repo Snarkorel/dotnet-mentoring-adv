@@ -17,7 +17,8 @@ namespace CartingService.Core
 
         public void Initialize(int cartId)
         {
-            _cart.Id = cartId;
+            if (_cart == null)
+                _cart = new Cart {Id = cartId};
         }
         
         public IEnumerable<CartItem> GetItems()
