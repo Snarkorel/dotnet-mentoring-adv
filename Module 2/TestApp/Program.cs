@@ -11,9 +11,9 @@ namespace TestApp
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Running Carting Service");
+            Console.WriteLine("TestApp initialized");
             TestCartingService();
-
+            TestCategoryService();
         }
 
         private static void PrintCartItem(CartItem item)
@@ -38,6 +38,8 @@ namespace TestApp
 
         private static void TestCartingService()
         {
+            Console.WriteLine("Testing Carting Service");
+
             var serviceProvider = new ServiceCollection()
                 .AddLogging()
                 .AddSingleton<IDatabaseService<CartItem>, LiteDbDatabaseService<CartItem>>()
@@ -69,9 +71,15 @@ namespace TestApp
             cartingService.Remove(1);
 
             GetAndPrintItems(cartingService);
-
+            
             //first item is intentionally not deleted and persists in database
         }
 
+        private static void TestCategoryService()
+        {
+            Console.WriteLine("Testing Category Service");
+
+            //TODO!
+        }
     }
 }
