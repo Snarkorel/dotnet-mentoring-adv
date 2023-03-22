@@ -5,7 +5,7 @@ VisualStudioVersion = 17.4.33103.184
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CartingService", "CartingService\CartingService.csproj", "{C6E19DF7-B376-4529-9E7A-53BB3FA2E7B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatalogService.Core", "CatalogService\CatalogService.Core.csproj", "{2B6DD38E-4A44-42D7-860D-987962462209}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatalogService.Core", "CatalogService.Core\CatalogService.Core.csproj", "{2B6DD38E-4A44-42D7-860D-987962462209}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatalogService.Data", "CatalogService.Data\CatalogService.Data.csproj", "{C618B1E8-BB71-49B6-BB3A-688203075705}"
 EndProject
