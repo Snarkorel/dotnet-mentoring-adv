@@ -1,4 +1,5 @@
-﻿using LiteDB;
+﻿using CartingService.Infrastructure.Interfaces;
+using LiteDB;
 
 namespace CartingService.Infrastructure.LiteDB
 {
