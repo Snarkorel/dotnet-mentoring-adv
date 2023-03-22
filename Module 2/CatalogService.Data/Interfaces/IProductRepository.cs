@@ -1,6 +1,9 @@
-﻿namespace CatalogService.Data.Interfaces
+﻿using CatalogService.Data.Models;
+
+namespace CatalogService.Data.Interfaces
 {
-    public interface IProductRepository : IRepository
+    public interface IProductRepository : IRepository<Product>
     {
+
     }
 }
