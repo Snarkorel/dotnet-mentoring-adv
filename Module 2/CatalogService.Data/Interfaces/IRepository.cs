@@ -6,7 +6,7 @@ namespace CatalogService.Data.Interfaces
     {
         TEntity Get(int id);
 
-        IEnumerable<TEntity> List();
+        IQueryable<TEntity> List();
 
         void Add(TEntity item);
 
