@@ -1,6 +1,6 @@
-﻿using CartingService.Entities;
+﻿using CartingService.Core.Entities;
 
-namespace CartingService.Interfaces
+namespace CartingService.Core.Interfaces
 {
     public interface ICartingService
     {
