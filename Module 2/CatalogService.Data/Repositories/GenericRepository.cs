@@ -8,6 +8,7 @@ namespace CatalogService.Data.Repositories
     {
         private readonly DbContext _context;
         
+        //Null checks, logging and exception processing skipped here because it's out of the task scope
         protected GenericRepository(DbContext context)
         {
             _context = context;
@@ -36,6 +37,12 @@ namespace CatalogService.Data.Repositories
         public virtual void Delete(TEntity item)
         {
             _context.Remove(item);
+        }
+
+        public virtual void Delete(int id)
+        {
+            var entity = Get(id);
+            Delete(entity);
         }
     }
 }
