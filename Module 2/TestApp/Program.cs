@@ -3,6 +3,12 @@ using CartingService.Infrastructure.Interfaces;
 using CartingService.Infrastructure.LiteDB;
 using CartingService.Core.Entities;
 using CartingService.Infrastructure.Repositories;
+using CatalogService.Core.Interfaces;
+using CatalogService.Data.Database;
+using CatalogService.Data.Interfaces;
+using CatalogService.Data.Repositories;
+using CatalogService.Core.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace TestApp
@@ -75,11 +81,79 @@ namespace TestApp
             //first item is intentionally not deleted and persists in database
         }
 
+        private static void PrintCategory(CategoryItem item)
+        {
+            Console.WriteLine(
+                $"[Category]\r\nName = {item.Name}\r\nImage = {item.Image}\r\nParent Category Id = {item.ParentCategoryId}\r\nParent Category = {item.ParentCategory}");
+        }
+
+        private static void PrintCategories(IEnumerable<CategoryItem> items)
+        {
+            Console.WriteLine("\r\nCategories:");
+            foreach (var item in items)
+            {
+                PrintCategory(item);
+            }
+        }
+
+        private static void GetAndPrintCategories(ICatalogService service)
+        {
+            var categories = service.ListCategories();
+            PrintCategories(categories);
+        }
+
         private static void TestCategoryService()
         {
             Console.WriteLine("Testing Category Service");
 
-            //TODO!
+            var serviceProvider = new ServiceCollection()
+                .AddSingleton<DbContext, CatalogContext>()
+                .AddSingleton<ICategoryRepository, CategoryRepository>()
+                .AddSingleton<IProductRepository, ProductRepository>()
+                .AddSingleton<ICatalogService, CatalogService.Core.CatalogService>()
+                .BuildServiceProvider();
+
+            var catalogService = serviceProvider.GetService<ICatalogService>();
+
+            Console.WriteLine("Categories methods");
+
+            Console.WriteLine("Listing categories");
+            GetAndPrintCategories(catalogService);
+
+            Console.WriteLine("Adding category");
+            var category = new CategoryItem {Name = "Main category", Image = new Uri("http://localhost/img.png"), ParentCategory = null, ParentCategoryId = null};
+            catalogService.AddCategory(category);
+            GetAndPrintCategories(catalogService);
+
+            var id = 3; //todo: dynamic unique id from db
+
+            Console.WriteLine("Modifying category");
+            category = catalogService.GetCategory(id);
+            category.Image = new Uri("http://localhost/image.png");
+            catalogService.UpdateCategory(category);
+            GetAndPrintCategories(catalogService);
+
+            Console.WriteLine("Adding nested category");
+            var nestedCategory = new CategoryItem
+            {
+                Name = "Child category",
+                Image = new Uri("http://127.0.0.1/logo.png"),
+                ParentCategory = category,
+                ParentCategoryId = id
+            };
+            catalogService.AddCategory(nestedCategory);
+            GetAndPrintCategories(catalogService);
+
+            Console.WriteLine($"Deleting category with id = {id+1}");
+            catalogService.DeleteCategory(id+1);
+            GetAndPrintCategories(catalogService);
+            Console.WriteLine($"Deleting category with id = {id}");
+            catalogService.DeleteCategory(id);
+            GetAndPrintCategories(catalogService);
+
+            Console.WriteLine("Categories methods test completed");
+
+            Console.WriteLine("Products methods");
         }
     }
 }
