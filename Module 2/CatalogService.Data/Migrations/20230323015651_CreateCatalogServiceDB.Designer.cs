@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CatalogService.Data.Migrations
 {
     [DbContext(typeof(CatalogContext))]
-    [Migration("20230323005159_CreateCatalogServiceDB")]
+    [Migration("20230323015651_CreateCatalogServiceDB")]
     partial class CreateCatalogServiceDB
     {
         /// <inheritdoc />
@@ -34,7 +34,6 @@ namespace CatalogService.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Image")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -67,11 +66,9 @@ namespace CatalogService.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
