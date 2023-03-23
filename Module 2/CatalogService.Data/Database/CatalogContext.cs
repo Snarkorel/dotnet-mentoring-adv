@@ -10,7 +10,9 @@ namespace CatalogService.Data.Database
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Server=.\SQLEXPRESS;Database=CatalogServiceDB;Trusted_Connection=True;");
+            //Assuming, that we're getting the connection string from config file
+            var connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=""C:\Users\Sergei_Piontkovskii\source\repos\dotnet-mntrg-adv\module 2\CatalogService.Data\Database\CatalogServiceDB.mdf"";Integrated Security=True;Connect Timeout=30";
+            optionsBuilder.UseSqlServer(connectionString);
         }
     }
 }
