@@ -1,4 +1,5 @@
-﻿using CatalogService.Core.Interfaces;
+﻿using CatalogService.Core.Entities;
+using CatalogService.Core.Interfaces;
 using CatalogService.Data.Interfaces;
 using CatalogService.Data.Models;
 
@@ -15,22 +16,22 @@ namespace CatalogService.Core
             _categoryRepository = categoryRepository;
         }
 
-        public Category GetCategory(int id)
+        public CategoryItem GetCategory(int id)
         {
             throw new NotImplementedException();
         }
 
-        public IQueryable<Category> ListCategories()
+        public IQueryable<CategoryItem> ListCategories()
         {
             throw new NotImplementedException();
         }
 
-        public bool AddCategory(Category category)
+        public bool AddCategory(CategoryItem category)
         {
             throw new NotImplementedException();
         }
 
-        public bool UpdateCategory(Category category)
+        public bool UpdateCategory(CategoryItem category)
         {
             throw new NotImplementedException();
         }
@@ -40,22 +41,22 @@ namespace CatalogService.Core
             throw new NotImplementedException();
         }
 
-        public Product GetProduct(int id)
+        public ProductItem GetProduct(int id)
         {
             throw new NotImplementedException();
         }
 
-        public IQueryable<Product> ListProducts()
+        public IQueryable<ProductItem> ListProducts()
         {
             throw new NotImplementedException();
         }
 
-        public bool AddProduct(Product product)
+        public bool AddProduct(ProductItem product)
         {
             throw new NotImplementedException();
         }
 
-        public bool UpdateProduct(Product product)
+        public bool UpdateProduct(ProductItem product)
         {
             throw new NotImplementedException();
         }

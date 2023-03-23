@@ -1,26 +1,27 @@
-﻿using CatalogService.Data.Models;
+﻿using CatalogService.Core.Entities;
+using CatalogService.Data.Models;
 
 namespace CatalogService.Core.Interfaces
 {
     public interface ICatalogService
     {
-        Category GetCategory(int id);
+        CategoryItem GetCategory(int id);
 
-        IQueryable<Category> ListCategories();
+        IQueryable<CategoryItem> ListCategories();
 
-        bool AddCategory(Category category);
+        bool AddCategory(CategoryItem category);
 
-        bool UpdateCategory(Category category);
+        bool UpdateCategory(CategoryItem category);
 
         bool DeleteCategory(int id);
 
-        Product GetProduct(int id);
+        ProductItem GetProduct(int id);
 
-        IQueryable<Product> ListProducts();
+        IQueryable<ProductItem> ListProducts();
 
-        bool AddProduct(Product product);
+        bool AddProduct(ProductItem product);
 
-        bool UpdateProduct(Product product);
+        bool UpdateProduct(ProductItem product);
 
         bool DeleteProduct(int id);
     }
