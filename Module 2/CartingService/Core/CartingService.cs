@@ -28,6 +28,11 @@ namespace CartingService.Core
 
         public bool AddItem(CartItem item)
         {
+            //validation
+            if (string.IsNullOrEmpty(item.Name))
+                return false;
+            
+            //business rules
             if (ItemExists(item.Id))
                 IncreaseCountIfExists(item);
             else
