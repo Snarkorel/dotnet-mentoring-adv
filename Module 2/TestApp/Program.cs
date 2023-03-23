@@ -102,6 +102,27 @@ namespace TestApp
             PrintCategories(categories);
         }
 
+        private static void PrintProduct(ProductItem item)
+        {
+            Console.WriteLine(
+                $"[Product]\r\nName = {item.Name}\r\nDescription = {item.Description}\r\nImage = {item.Image}\r\nCategory = {item.Category}\r\nPrice = {item.Price}\r\nAmount = {item.Amount}");
+        }
+
+        private static void PrintProducts(IEnumerable<ProductItem> items)
+        {
+            Console.WriteLine("\r\nItems:");
+            foreach (var item in items)
+            {
+                PrintProduct(item);
+            }
+        }
+
+        private static void GetAndPrintProducts(ICatalogService service)
+        {
+            var products = service.ListProducts();
+            PrintProducts(products);
+        }
+
         private static void TestCategoryService()
         {
             Console.WriteLine("Testing Category Service");
@@ -125,7 +146,7 @@ namespace TestApp
             catalogService.AddCategory(category);
             GetAndPrintCategories(catalogService);
 
-            var id = 3; //todo: dynamic unique id from db
+            var id = 5; //todo: dynamic id update based on returned value
 
             Console.WriteLine("Modifying category");
             category = catalogService.GetCategory(id);
@@ -144,16 +165,39 @@ namespace TestApp
             catalogService.AddCategory(nestedCategory);
             GetAndPrintCategories(catalogService);
 
-            Console.WriteLine($"Deleting category with id = {id+1}");
-            catalogService.DeleteCategory(id+1);
-            GetAndPrintCategories(catalogService);
-            Console.WriteLine($"Deleting category with id = {id}");
-            catalogService.DeleteCategory(id);
-            GetAndPrintCategories(catalogService);
+            //Delete tests turned off
+            //Console.WriteLine($"Deleting category with id = {id+1}");
+            //catalogService.DeleteCategory(id+1);
+            //GetAndPrintCategories(catalogService);
+            //Console.WriteLine($"Deleting category with id = {id}");
+            //catalogService.DeleteCategory(id);
+            //GetAndPrintCategories(catalogService);
 
             Console.WriteLine("Categories methods test completed");
 
             Console.WriteLine("Products methods");
+
+            Console.WriteLine("Listing products");
+            GetAndPrintProducts(catalogService);
+
+            Console.WriteLine("Adding product");
+            var product = new ProductItem { Name = "Soap", Description = "Regular hygienic soap", Image = new Uri("http://localhost/soap.png"), Category = category, Amount = 2, Price = 12.5m };
+            catalogService.AddProduct(product);
+            GetAndPrintProducts(catalogService);
+
+            id = 1; //todo: dynamic unique id from db
+
+            Console.WriteLine("Modifying product");
+            product = catalogService.GetProduct(id);
+            product.Price = 16.25m;
+            catalogService.UpdateProduct(product);
+            GetAndPrintProducts(catalogService);
+
+            //Console.WriteLine($"Deleting product with id = {id}");
+            //catalogService.DeleteProduct(id);
+            //GetAndPrintProducts(catalogService);
+
+            Console.WriteLine("Products methods test completed");
         }
     }
 }
