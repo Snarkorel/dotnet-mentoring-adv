@@ -27,22 +27,26 @@ namespace CatalogService.Data.Repositories
         public virtual void Add(TEntity item)
         {
             _context.Add(item);
+            _context.SaveChanges();
         }
 
         public virtual void Update(TEntity item)
         {
             _context.Update(item);
+            _context.SaveChanges();
         }
 
         public virtual void Delete(TEntity item)
         {
             _context.Remove(item);
+            _context.SaveChanges();
         }
 
         public virtual void Delete(int id)
         {
             var entity = Get(id);
             Delete(entity);
+            _context.SaveChanges();
         }
     }
 }
