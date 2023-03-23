@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CatalogService.Data\CatalogService.Data.csproj" />
+  </ItemGroup>
+
 </Project>

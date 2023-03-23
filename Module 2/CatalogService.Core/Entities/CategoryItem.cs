@@ -2,13 +2,13 @@
 
 namespace CatalogService.Core.Entities
 {
-    public class Category
+    public class CategoryItem
     {
         [Required]
         public string Name { get; set; }
 
         public Uri Image { get; set; }
 
-        public Category ParentCategory { get; set; }
+        public CategoryItem ParentCategory { get; set; }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace CatalogService.Core.Entities
 {
-    public class Product
+    public class ProductItem
     {
         [Required]
         public string Name { get; set; }
@@ -12,7 +12,7 @@ namespace CatalogService.Core.Entities
         public Uri Image { get; set; }
 
         [Required]
-        public Category Category { get; set; }
+        public CategoryItem Category { get; set; }
 
         [Required]
         public decimal Price { get; set; }
