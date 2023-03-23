@@ -57,7 +57,7 @@ namespace TestApp
 
             Console.WriteLine("Adding new item");
             cartingService.AddItem(new CartItem
-                { Id = 1, Image = "https://google.com/logo.png", Name = "testname", Price = 10.25m, Quantity = 1 });
+                { Id = 1, Image = new Uri("https://google.com/logo.png"), Name = "testname", Price = 10.25m, Quantity = 1 });
 
             GetAndPrintItems(cartingService);
 
