@@ -13,27 +13,27 @@ namespace CatalogService.Data.Repositories
             _context = context;
         }
         
-        public TEntity Get(int id)
+        public virtual TEntity Get(int id)
         {
             return _context.Find<TEntity>(id) ?? throw new InvalidOperationException($"Object with id={id} not found in DB");
         }
 
-        public IQueryable<TEntity> List()
+        public virtual IQueryable<TEntity> List()
         {
             return _context.Set<TEntity>();
         }
 
-        public void Add(TEntity item)
+        public virtual void Add(TEntity item)
         {
             _context.Add(item);
         }
 
-        public void Update(TEntity item)
+        public virtual void Update(TEntity item)
         {
             _context.Update(item);
         }
 
-        public void Delete(TEntity item)
+        public virtual void Delete(TEntity item)
         {
             _context.Remove(item);
         }
