@@ -17,6 +17,8 @@ namespace CatalogService.Core
             _categoryRepository = categoryRepository;
         }
 
+        //some business logic should be there
+
         public CategoryItem GetCategory(int id)
         {
             var item = _categoryRepository.Get(id);
@@ -66,27 +68,31 @@ namespace CatalogService.Core
 
         public ProductItem GetProduct(int id)
         {
-            throw new NotImplementedException();
+            var product = _productRepository.Get(id);
+            return ProductHelper.ProductToProductItem(product);
         }
 
         public IQueryable<ProductItem> ListProducts()
         {
-            throw new NotImplementedException();
+            return _productRepository.List().ProductsToProductItems();
         }
 
         public bool AddProduct(ProductItem product)
         {
-            throw new NotImplementedException();
+            _productRepository.Add(ProductHelper.ProductItemToProduct(product));
+            return true;
         }
 
         public bool UpdateProduct(ProductItem product)
         {
-            throw new NotImplementedException();
+            _productRepository.Update(ProductHelper.ProductItemToProduct(product));
+            return true;
         }
 
         public bool DeleteProduct(int id)
         {
-            throw new NotImplementedException();
+            _productRepository.Delete(id);
+            return true;
         }
     }
 }
