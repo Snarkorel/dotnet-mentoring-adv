@@ -1,6 +1,8 @@
 ﻿using CatalogService.Core.Entities;
+using CatalogService.Core.Helpers;
 using CatalogService.Core.Interfaces;
 using CatalogService.Data.Interfaces;
+using CatalogService.Data.Models;
 
 namespace CatalogService.Core
 {
@@ -28,25 +30,35 @@ namespace CatalogService.Core
 
             return category;
         }
-
+        
         public IQueryable<CategoryItem> ListCategories()
         {
-            throw new NotImplementedException();
+            return _categoryRepository.List().CategoriesToCategoryItems();
         }
 
         public bool AddCategory(CategoryItem category)
         {
-            throw new NotImplementedException();
+            _categoryRepository.Add(new Category
+            {
+                Name = category.Name,
+                Image = category.Image.ToString(),
+                ParentCategoryId = category.ParentCategoryId
+            });
+
+            return true;
         }
 
         public bool UpdateCategory(CategoryItem category)
         {
-            throw new NotImplementedException();
+            _categoryRepository.Update(CategoryHelper.CategoryItemToCategory(category));
+            return true;
         }
 
         public bool DeleteCategory(int id)
         {
-            throw new NotImplementedException();
+            _categoryRepository.Delete(id);
+
+            return true;
         }
 
         public ProductItem GetProduct(int id)
