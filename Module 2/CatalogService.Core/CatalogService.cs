@@ -26,8 +26,11 @@ namespace CatalogService.Core
                 category.Image = new Uri(item.Image);
 
             if (item.ParentCategoryId != null)
+            {
                 category.ParentCategory = GetCategory(item.ParentCategoryId.Value);
-
+                category.ParentCategoryId = item.ParentCategoryId;
+            }
+            
             return category;
         }
         
@@ -41,7 +44,7 @@ namespace CatalogService.Core
             _categoryRepository.Add(new Category
             {
                 Name = category.Name,
-                Image = category.Image.ToString(),
+                Image = category.Image != null ? category.Image.ToString() : string.Empty,
                 ParentCategoryId = category.ParentCategoryId
             });
 

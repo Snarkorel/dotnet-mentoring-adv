@@ -11,7 +11,7 @@ namespace CatalogService.Data.Models
         public string Name { get; set; }
 
         [DataType(DataType.ImageUrl)]
-        public string Image { get; set; }
+        public string? Image { get; set; }
 
         [ForeignKey("ParentCategory")]
         public int? ParentCategoryId { get; set; }

@@ -11,10 +11,10 @@ namespace CatalogService.Data.Models
         public string Name { get; set; }
 
         [DataType(DataType.Html)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [DataType(DataType.ImageUrl)]
-        public string Image { get; set; }
+        public string? Image { get; set; }
 
         [Required]
         [ForeignKey("Category")]
