@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CatalogService.Data.Migrations
 {
     [DbContext(typeof(CatalogContext))]
-    [Migration("20230322232211_CreateCatalogServiceDB")]
+    [Migration("20230323000414_CreateCatalogServiceDB")]
     partial class CreateCatalogServiceDB
     {
         /// <inheritdoc />
@@ -79,7 +79,7 @@ namespace CatalogService.Data.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("money");
 
                     b.HasKey("Id");
 

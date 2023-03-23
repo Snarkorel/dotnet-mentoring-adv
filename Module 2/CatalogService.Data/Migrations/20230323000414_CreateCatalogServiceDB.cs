@@ -41,7 +41,7 @@ namespace CatalogService.Data.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CategoryId = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Price = table.Column<decimal>(type: "money", nullable: false),
                     Amount = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
