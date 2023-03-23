@@ -12,6 +12,6 @@ namespace CatalogService.Data.Interfaces
 
         void Update(TEntity item);
 
-        void Delete(int id);
+        void Delete(TEntity item);
     }
 }
