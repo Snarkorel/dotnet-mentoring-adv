@@ -14,7 +14,7 @@ namespace CatalogService.Data.Models
         public string Image { get; set; }
 
         [ForeignKey("ParentCategory")]
-        public int ParentCategoryId { get; set; }
+        public int? ParentCategoryId { get; set; }
 
         public Category ParentCategory { get; set; }
     }
