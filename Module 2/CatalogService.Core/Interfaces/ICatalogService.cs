@@ -1,5 +1,4 @@
 ﻿using CatalogService.Core.Entities;
-using CatalogService.Data.Models;
 
 namespace CatalogService.Core.Interfaces
 {

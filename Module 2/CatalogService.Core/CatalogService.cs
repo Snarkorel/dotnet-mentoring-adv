@@ -1,7 +1,6 @@
 ﻿using CatalogService.Core.Entities;
 using CatalogService.Core.Interfaces;
 using CatalogService.Data.Interfaces;
-using CatalogService.Data.Models;
 
 namespace CatalogService.Core
 {
@@ -18,7 +17,16 @@ namespace CatalogService.Core
 
         public CategoryItem GetCategory(int id)
         {
-            throw new NotImplementedException();
+            var item = _categoryRepository.Get(id);
+            var category = new CategoryItem {Name = item.Name};
+
+            if (!string.IsNullOrEmpty(item.Image))
+                category.Image = new Uri(item.Image);
+
+            if (item.ParentCategoryId != null)
+                category.ParentCategory = GetCategory(item.ParentCategoryId.Value);
+
+            return category;
         }
 
         public IQueryable<CategoryItem> ListCategories()
