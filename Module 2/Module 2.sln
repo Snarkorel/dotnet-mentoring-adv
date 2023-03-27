@@ -5,11 +5,13 @@ VisualStudioVersion = 17.4.33103.184
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CartingService", "CartingService\CartingService.csproj", "{C6E19DF7-B376-4529-9E7A-53BB3FA2E7B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatalogService.Core", "CatalogService.Core\CatalogService.Core.csproj", "{2B6DD38E-4A44-42D7-860D-987962462209}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CatalogService.Core", "CatalogService.Core\CatalogService.Core.csproj", "{2B6DD38E-4A44-42D7-860D-987962462209}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatalogService.Data", "CatalogService.Data\CatalogService.Data.csproj", "{C618B1E8-BB71-49B6-BB3A-688203075705}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CatalogService.Data", "CatalogService.Data\CatalogService.Data.csproj", "{C618B1E8-BB71-49B6-BB3A-688203075705}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{0FC1306C-02DA-4820-80AE-2856CA1CB57B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "TestApp\TestApp.csproj", "{0FC1306C-02DA-4820-80AE-2856CA1CB57B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatalogService.Domain", "CatalogService.Domain\CatalogService.Domain.csproj", "{9EA74A6E-621D-42D7-A6D8-6F2EBE0B9801}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{0FC1306C-02DA-4820-80AE-2856CA1CB57B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FC1306C-02DA-4820-80AE-2856CA1CB57B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0FC1306C-02DA-4820-80AE-2856CA1CB57B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EA74A6E-621D-42D7-A6D8-6F2EBE0B9801}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EA74A6E-621D-42D7-A6D8-6F2EBE0B9801}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EA74A6E-621D-42D7-A6D8-6F2EBE0B9801}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EA74A6E-621D-42D7-A6D8-6F2EBE0B9801}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

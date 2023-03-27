@@ -1,13 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CatalogService.Core.Entities
+namespace CatalogService.Domain.Entities
 {
     public class CategoryItem
     {
-        [Required]
         public string Name { get; set; }
 
-        public Uri Image { get; set; }
+        public string Image { get; set; }
 
         public CategoryItem ParentCategory { get; set; }
 

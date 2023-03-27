@@ -1,8 +1,5 @@
-﻿using CatalogService.Core.Entities;
-using CatalogService.Core.Helpers;
+﻿using CatalogService.Domain.Entities;
 using CatalogService.Core.Interfaces;
-using CatalogService.Data.Interfaces;
-using CatalogService.Data.Models;
 
 namespace CatalogService.Core
 {
@@ -17,81 +14,89 @@ namespace CatalogService.Core
             _categoryRepository = categoryRepository;
         }
 
-        //some business logic should be there
+        //TODO: some business logic should be there in almost each method
 
-        public CategoryItem GetCategory(int id)
+        public async Task <CategoryItem> GetCategory(int id)
         {
-            var item = _categoryRepository.Get(id);
-            var category = new CategoryItem {Name = item.Name};
 
-            if (!string.IsNullOrEmpty(item.Image))
-                category.Image = new Uri(item.Image);
+            //var category = new CategoryItem {Name = item.Name};
 
-            if (item.ParentCategoryId != null)
-            {
-                category.ParentCategory = GetCategory(item.ParentCategoryId.Value);
-                category.ParentCategoryId = item.ParentCategoryId;
-            }
-            
+            //if (!string.IsNullOrEmpty(item.Image))
+            //    category.Image = new Uri(item.Image);
+
+            //if (item.ParentCategoryId != null)
+            //{
+            //    category.ParentCategory = GetCategory(item.ParentCategoryId.Value);
+            //    category.ParentCategoryId = item.ParentCategoryId;
+            //}
+
+            var category = await _categoryRepository.GetAsync(id);
             return category;
         }
         
-        public IQueryable<CategoryItem> ListCategories()
+        public async Task <IEnumerable<CategoryItem>> ListCategories()
         {
-            return _categoryRepository.List().CategoriesToCategoryItems();
+            return await _categoryRepository.ListAsync();
         }
 
-        public bool AddCategory(CategoryItem category)
+        public async Task<bool> AddCategory(CategoryItem category)
         {
-            _categoryRepository.Add(new Category
-            {
-                Name = category.Name,
-                Image = category.Image != null ? category.Image.ToString() : string.Empty,
-                ParentCategoryId = category.ParentCategoryId
-            });
+            //_categoryRepository.Add(new Category
+            //{
+            //    Name = category.Name,
+            //    Image = category.Image != null ? category.Image.ToString() : string.Empty,
+            //    ParentCategoryId = category.ParentCategoryId
+            //});
 
+            await _categoryRepository.AddAsync(category);
             return true;
         }
 
-        public bool UpdateCategory(CategoryItem category)
+        public async Task<bool> UpdateCategory(CategoryItem category)
         {
-            _categoryRepository.Update(CategoryHelper.CategoryItemToCategory(category));
+            //_categoryRepository.Update(CategoryHelper.CategoryItemToCategory(category));
+
+            await _categoryRepository.UpdateAsync(category);
             return true;
         }
 
-        public bool DeleteCategory(int id)
+        public async Task<bool> DeleteCategory(int id)
         {
-            _categoryRepository.Delete(id);
-
+            await _categoryRepository.DeleteAsync(id);
             return true;
         }
 
-        public ProductItem GetProduct(int id)
+        public async Task<ProductItem> GetProduct(int id)
         {
-            var product = _productRepository.Get(id);
-            return ProductHelper.ProductToProductItem(product);
+            //return ProductHelper.ProductToProductItem(product);
+
+            var product = await _productRepository.GetAsync(id);
+            return product;
         }
 
-        public IQueryable<ProductItem> ListProducts()
+        public async Task <IEnumerable<ProductItem>> ListProducts()
         {
-            return _productRepository.List().ProductsToProductItems();
+            return await _productRepository.ListAsync();//.ProductsToProductItems();
         }
 
-        public bool AddProduct(ProductItem product)
+        public async Task <bool> AddProduct(ProductItem product)
         {
-            _productRepository.Add(ProductHelper.ProductItemToProduct(product));
+            //_productRepository.Add(ProductHelper.ProductItemToProduct(product));
+
+            await _productRepository.AddAsync(product);
             return true;
         }
 
-        public bool UpdateProduct(ProductItem product)
+        public async Task <bool> UpdateProduct(ProductItem product)
         {
-            _productRepository.Update(ProductHelper.ProductItemToProduct(product));
+            //_productRepository.Update(ProductHelper.ProductItemToProduct(product));
+            await _productRepository.UpdateAsync(product);
             return true;
         }
 
-        public bool DeleteProduct(int id)
+        public async Task<bool> DeleteProduct(int id)
         {
-            _productRepository.Delete(id);
+            await _productRepository.DeleteAsync(id);
             return true;
         }
     }

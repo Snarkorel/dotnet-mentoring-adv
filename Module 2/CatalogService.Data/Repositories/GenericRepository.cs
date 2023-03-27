@@ -1,17 +1,17 @@
-﻿using CatalogService.Data.Interfaces;
+﻿using CatalogService.Core.Interfaces;
 using CatalogService.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CatalogService.Data.Repositories
 {
-    public abstract class GenericRepository<TEntity> : IRepository<TEntity> where TEntity : Entity
+    public abstract class GenericRepository<TEntity> : IRepository<TEntity> where TEntity : DbEntity
     {
         private readonly DbContext _context;
         
         //Null checks, logging and exception processing skipped here because it's out of the task scope
         protected GenericRepository(DbContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
         
         public virtual TEntity Get(int id)
@@ -19,9 +19,19 @@ namespace CatalogService.Data.Repositories
             return _context.Find<TEntity>(id) ?? throw new InvalidOperationException($"Object with id={id} not found in DB");
         }
 
-        public virtual IQueryable<TEntity> List()
+        public async Task<TEntity> GetAsync(int id)
+        {
+            return await _context.FindAsync<TEntity>(id) ?? throw new InvalidOperationException($"Object with id={id} not found in DB");
+        }
+
+        public virtual IEnumerable<TEntity> List()
         {
             return _context.Set<TEntity>();
+        }
+
+        public async Task<IEnumerable<TEntity>> ListAsync()
+        {
+            return await _context.Set<TEntity>().ToListAsync();
         }
 
         public virtual void Add(TEntity item)
@@ -30,23 +40,36 @@ namespace CatalogService.Data.Repositories
             _context.SaveChanges();
         }
 
+        public virtual async Task AddAsync(TEntity item)
+        {
+            await _context.AddAsync(item);
+            await _context.SaveChangesAsync();
+        }
+
         public virtual void Update(TEntity item)
         {
             _context.Update(item);
             _context.SaveChanges();
         }
 
-        public virtual void Delete(TEntity item)
+        public virtual async Task UpdateAsync(TEntity item)
         {
-            _context.Remove(item);
-            _context.SaveChanges();
+            _context.Update(item);
+            await _context.SaveChangesAsync();
         }
-
+        
         public virtual void Delete(int id)
         {
             var entity = Get(id);
-            Delete(entity);
+            _context.Remove(entity);
             _context.SaveChanges();
+        }
+
+        public virtual async Task DeleteAsync(int id)
+        {
+            var entity = GetAsync(id);
+            _context.Remove(entity);
+            await _context.SaveChangesAsync();
         }
     }
 }

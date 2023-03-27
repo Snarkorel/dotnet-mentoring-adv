@@ -1,27 +1,27 @@
-﻿using CatalogService.Core.Entities;
+﻿using CatalogService.Domain.Entities;
 
 namespace CatalogService.Core.Interfaces
 {
     public interface ICatalogService
     {
-        CategoryItem GetCategory(int id);
+        Task <CategoryItem> GetCategory(int id);
 
-        IQueryable<CategoryItem> ListCategories();
+        Task<IEnumerable<CategoryItem>> ListCategories();
 
-        bool AddCategory(CategoryItem category);
+        Task<bool> AddCategory(CategoryItem category);
 
-        bool UpdateCategory(CategoryItem category);
+        Task<bool> UpdateCategory(CategoryItem category);
 
-        bool DeleteCategory(int id);
+        Task<bool> DeleteCategory(int id);
 
-        ProductItem GetProduct(int id);
+        Task<ProductItem> GetProduct(int id);
 
-        IQueryable<ProductItem> ListProducts();
+        Task<IEnumerable<ProductItem>> ListProducts();
 
-        bool AddProduct(ProductItem product);
+        Task<bool> AddProduct(ProductItem product);
 
-        bool UpdateProduct(ProductItem product);
+        Task<bool> UpdateProduct(ProductItem product);
 
-        bool DeleteProduct(int id);
+        Task<bool> DeleteProduct(int id);
     }
 }

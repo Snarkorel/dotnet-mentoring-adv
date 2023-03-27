@@ -5,9 +5,8 @@ using CartingService.Core.Entities;
 using CartingService.Infrastructure.Repositories;
 using CatalogService.Core.Interfaces;
 using CatalogService.Data.Database;
-using CatalogService.Data.Interfaces;
 using CatalogService.Data.Repositories;
-using CatalogService.Core.Entities;
+using CatalogService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -56,7 +55,7 @@ namespace TestApp
             var cartingService = serviceProvider.GetService<ICartingService>();
 
             Console.WriteLine("Initializing CartingService...");
-            cartingService.Initialize(321);
+            cartingService.CreateCart(321);
 
             Console.WriteLine("Checking existing items in cart");
             GetAndPrintItems(cartingService);
@@ -74,7 +73,7 @@ namespace TestApp
             GetAndPrintItems(cartingService);
 
             Console.WriteLine("Deleting item");
-            cartingService.Remove(1);
+            cartingService.RemoveItem(1);
 
             GetAndPrintItems(cartingService);
             
@@ -99,7 +98,7 @@ namespace TestApp
         private static void GetAndPrintCategories(ICatalogService service)
         {
             var categories = service.ListCategories();
-            PrintCategories(categories);
+            PrintCategories(categories.Result);
         }
 
         private static void PrintProduct(ProductItem item)
@@ -120,7 +119,7 @@ namespace TestApp
         private static void GetAndPrintProducts(ICatalogService service)
         {
             var products = service.ListProducts();
-            PrintProducts(products);
+            PrintProducts(products.Result);
         }
 
         private static void TestCategoryService()
@@ -142,15 +141,15 @@ namespace TestApp
             GetAndPrintCategories(catalogService);
 
             Console.WriteLine("Adding category");
-            var category = new CategoryItem {Name = "Main category", Image = new Uri("http://localhost/img.png"), ParentCategory = null, ParentCategoryId = null};
+            var category = new CategoryItem {Name = "Main category", Image = "http://localhost/img.png", ParentCategory = null, ParentCategoryId = null};
             catalogService.AddCategory(category);
             GetAndPrintCategories(catalogService);
 
             var id = 5; //todo: dynamic id update based on returned value
 
             Console.WriteLine("Modifying category");
-            category = catalogService.GetCategory(id);
-            category.Image = new Uri("http://localhost/image.png");
+            category = catalogService.GetCategory(id).Result;
+            category.Image = "http://localhost/image.png";
             catalogService.UpdateCategory(category);
             GetAndPrintCategories(catalogService);
 
@@ -158,7 +157,7 @@ namespace TestApp
             var nestedCategory = new CategoryItem
             {
                 Name = "Child category",
-                Image = new Uri("http://127.0.0.1/logo.png"),
+                Image = "http://127.0.0.1/logo.png",
                 ParentCategory = category,
                 ParentCategoryId = id
             };
@@ -181,14 +180,14 @@ namespace TestApp
             GetAndPrintProducts(catalogService);
 
             Console.WriteLine("Adding product");
-            var product = new ProductItem { Name = "Soap", Description = "Regular hygienic soap", Image = new Uri("http://localhost/soap.png"), Category = category, Amount = 2, Price = 12.5m };
+            var product = new ProductItem { Name = "Soap", Description = "Regular hygienic soap", Image = "http://localhost/soap.png", Category = category, Amount = 2, Price = 12.5m };
             catalogService.AddProduct(product);
             GetAndPrintProducts(catalogService);
 
             id = 1; //todo: dynamic unique id from db
 
             Console.WriteLine("Modifying product");
-            product = catalogService.GetProduct(id);
+            product = catalogService.GetProduct(id).Result;
             product.Price = 16.25m;
             catalogService.UpdateProduct(product);
             GetAndPrintProducts(catalogService);

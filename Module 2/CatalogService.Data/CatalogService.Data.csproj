@@ -18,4 +18,8 @@
     <Folder Include="Migrations\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CatalogService.Core\CatalogService.Core.csproj" />
+  </ItemGroup>
+
 </Project>

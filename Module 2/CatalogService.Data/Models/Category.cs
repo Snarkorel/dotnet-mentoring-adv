@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CatalogService.Data.Models
 {
-    public class Category : Entity
+    public class Category : DbEntity
     {
         [Required]
         [MaxLength(50)]
