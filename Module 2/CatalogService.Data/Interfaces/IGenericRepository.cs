@@ -1,6 +1,6 @@
 ﻿namespace CatalogService.Core.Interfaces
 {
-    public interface IRepository<TEntity>
+    public interface IGenericRepository<TEntity>
     {
         TEntity Get(int id);
 

@@ -16,6 +16,6 @@ namespace CatalogService.Data.Models
         [ForeignKey("ParentCategory")]
         public int? ParentCategoryId { get; set; }
 
-        public Category ParentCategory { get; set; }
+        public Category? ParentCategory { get; set; }
     }
 }

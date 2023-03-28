@@ -1,4 +1,5 @@
 ﻿using CatalogService.Core.Interfaces;
+using CatalogService.Data.Mappers;
 using CatalogService.Data.Models;
 using CatalogService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -8,47 +9,32 @@ namespace CatalogService.Data.Repositories
     public class ProductRepository : GenericRepository<Product>, IProductRepository
     {
         public ProductRepository(DbContext context) : base(context) { }
-
-        public ProductItem Get(int id)
+        
+        public async Task<ProductItem> GetProductAsync(int id)
         {
-            throw new NotImplementedException();
+            var product = await GetAsync(id);
+            return product.ToProductItem();
         }
 
-        public async Task<ProductItem> GetAsync(int id)
+        public async Task<IEnumerable<ProductItem>> ListProductsAsync()
         {
-            throw new NotImplementedException();
+            var products = await ListAsync();
+            return products.Select(x => x.ToProductItem());
         }
 
-        public IEnumerable<ProductItem> List()
+        public async Task AddProductAsync(ProductItem item)
         {
-            throw new NotImplementedException();
+            await AddAsync(item.ToProduct());
         }
 
-        public async Task<IEnumerable<ProductItem>> ListAsync()
+        public async Task UpdateProductAsync(ProductItem item)
         {
-            throw new NotSupportedException();
+            await UpdateAsync(item.ToProduct());
         }
 
-        public void Add(ProductItem item)
+        public async Task DeleteProductAsync(int id)
         {
-            throw new NotImplementedException();
+            await DeleteAsync(id);
         }
-
-        public Task AddAsync(ProductItem item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update(ProductItem item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task UpdateAsync(ProductItem item)
-        {
-            throw new NotImplementedException();
-        }
-
-
     }
 }

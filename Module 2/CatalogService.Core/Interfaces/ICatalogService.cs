@@ -4,7 +4,7 @@ namespace CatalogService.Core.Interfaces
 {
     public interface ICatalogService
     {
-        Task <CategoryItem> GetCategory(int id);
+        Task<CategoryItem> GetCategory(int id);
 
         Task<IEnumerable<CategoryItem>> ListCategories();
 

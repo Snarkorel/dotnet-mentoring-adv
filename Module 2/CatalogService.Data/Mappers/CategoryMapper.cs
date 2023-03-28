@@ -20,9 +20,10 @@ namespace CatalogService.Data.Mappers
         {
             return new CategoryItem
             {
+                Id = category.Id,
                 Name = category.Name,
                 Image = category.Image,
-                ParentCategory = category.ParentCategory.ToCategoryItem()
+                ParentCategory = category.ParentCategory?.ToCategoryItem()
             };
         }
     }

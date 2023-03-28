@@ -1,4 +1,5 @@
 ﻿using CatalogService.Core.Interfaces;
+using CatalogService.Data.Mappers;
 using CatalogService.Data.Models;
 using CatalogService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -9,48 +10,31 @@ namespace CatalogService.Data.Repositories
     {
         public CategoryRepository(DbContext context) : base(context) { }
 
-        public CategoryItem Get(int id)
+        public async Task<CategoryItem> GetCategoryAsync(int id)
         {
-            var category = base.Get(id);
-            
-            throw new NotImplementedException();
+            var category = await GetAsync(id);
+            return category.ToCategoryItem();
         }
 
-        public async Task<CategoryItem> GetAsync(int id)
+        public async Task<IEnumerable<CategoryItem>> ListCategoriesAsync()
         {
-            var category = await base.GetAsync(id);
-
-            throw new NotImplementedException();
+            var categories = await ListAsync();
+            return categories.Select(x => x.ToCategoryItem());
         }
 
-        public IEnumerable<CategoryItem> List()
+        public async Task AddCategoryAsync(CategoryItem item)
         {
-            throw new NotImplementedException();
+            await AddAsync(item.ToCategory());
         }
 
-        public async Task<IEnumerable<CategoryItem>> ListAsync()
+        public async Task UpdateCategoryAsync(CategoryItem item)
         {
-            throw new NotImplementedException();
+            await UpdateAsync(item.ToCategory());
         }
 
-        public void Add(CategoryItem item)
+        public async Task DeleteCategoryAsync(int id)
         {
-            throw new NotImplementedException();
-        }
-
-        public async Task AddAsync(CategoryItem item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update(CategoryItem item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task UpdateAsync(CategoryItem item)
-        {
-            throw new NotImplementedException();
+            await DeleteAsync(id);
         }
     }
 }

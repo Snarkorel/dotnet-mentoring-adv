@@ -9,6 +9,7 @@ using CatalogService.Data.Repositories;
 using CatalogService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using CatalogService.Core;
 
 namespace TestApp
 {
@@ -17,7 +18,7 @@ namespace TestApp
         static void Main(string[] args)
         {
             Console.WriteLine("TestApp initialized");
-            TestCartingService();
+            //TestCartingService();
             TestCategoryService();
         }
 
@@ -72,18 +73,17 @@ namespace TestApp
 
             GetAndPrintItems(cartingService);
 
-            Console.WriteLine("Deleting item");
+            Console.WriteLine("Deleting items");
             cartingService.RemoveItem(1);
+            cartingService.RemoveItem(2);
 
             GetAndPrintItems(cartingService);
-            
-            //first item is intentionally not deleted and persists in database
         }
 
         private static void PrintCategory(CategoryItem item)
         {
             Console.WriteLine(
-                $"[Category]\r\nName = {item.Name}\r\nImage = {item.Image}\r\nParent Category Id = {item.ParentCategory?.Id}\r\nParent Category = {item.ParentCategory}");
+                $"[Category]\r\nId = {item.Id}\r\nName = {item.Name}\r\nImage = {item.Image}\r\nParent Category = {item.ParentCategory?.Id} | {item.ParentCategory?.Name}");
         }
 
         private static void PrintCategories(IEnumerable<CategoryItem> items)
@@ -95,16 +95,16 @@ namespace TestApp
             }
         }
 
-        private static void GetAndPrintCategories(ICatalogService service)
+        private static async Task GetAndPrintCategories(ICatalogService service)
         {
-            var categories = service.ListCategories();
-            PrintCategories(categories.Result);
+            var categories = await service.ListCategories();
+            PrintCategories(categories);
         }
 
         private static void PrintProduct(ProductItem item)
         {
             Console.WriteLine(
-                $"[Product]\r\nName = {item.Name}\r\nDescription = {item.Description}\r\nImage = {item.Image}\r\nCategory = {item.Category}\r\nPrice = {item.Price}\r\nAmount = {item.Amount}");
+                $"[Product]\r\nId = {item.Id}\r\nName = {item.Name}\r\nDescription = {item.Description}\r\nImage = {item.Image}\r\nCategory = [{item.Category.Id}] {item.Category.Name}\r\nPrice = {item.Price}\r\nAmount = {item.Amount}");
         }
 
         private static void PrintProducts(IEnumerable<ProductItem> items)
@@ -122,12 +122,23 @@ namespace TestApp
             PrintProducts(products.Result);
         }
 
+        private static async Task CleanupCategories(ICatalogService service)
+        {
+            Console.WriteLine("Cleaning up categories...");
+            var categories = await service.ListCategories();
+            foreach (var category in categories)
+            {
+                Console.WriteLine($"Cleaning up category with id={category.Id}");
+                await service.DeleteCategory(category.Id);
+            }
+        }
+
         private static void TestCategoryService()
         {
             Console.WriteLine("Testing Category Service");
 
             var serviceProvider = new ServiceCollection()
-                .AddSingleton<DbContext, CatalogContext>()
+                .AddDbContext<DbContext, CatalogContext>(ServiceLifetime.Transient)
                 .AddSingleton<ICategoryRepository, CategoryRepository>()
                 .AddSingleton<IProductRepository, ProductRepository>()
                 .AddSingleton<ICatalogService, CatalogService.Core.CatalogService>()
@@ -138,20 +149,21 @@ namespace TestApp
             Console.WriteLine("Categories methods");
 
             Console.WriteLine("Listing categories");
-            GetAndPrintCategories(catalogService);
+            GetAndPrintCategories(catalogService).Wait();
+
+            CleanupCategories(catalogService).Wait();
 
             Console.WriteLine("Adding category");
             var category = new CategoryItem {Name = "Main category", Image = "http://localhost/img.png", ParentCategory = null};
-            catalogService.AddCategory(category);
-            GetAndPrintCategories(catalogService);
-
-            var id = 5; //todo: dynamic id update based on returned value
-
+            catalogService.AddCategory(category).Wait();
+            GetAndPrintCategories(catalogService).Wait();
+            
             Console.WriteLine("Modifying category");
+            var id = catalogService.ListCategories().Result.First().Id;
             category = catalogService.GetCategory(id).Result;
             category.Image = "http://localhost/image.png";
-            catalogService.UpdateCategory(category);
-            GetAndPrintCategories(catalogService);
+            catalogService.UpdateCategory(category).Wait();
+            GetAndPrintCategories(catalogService).Wait();
 
             Console.WriteLine("Adding nested category");
             var nestedCategory = new CategoryItem
@@ -160,42 +172,36 @@ namespace TestApp
                 Image = "http://127.0.0.1/logo.png",
                 ParentCategory = category
             };
-            catalogService.AddCategory(nestedCategory);
-            GetAndPrintCategories(catalogService);
+            catalogService.AddCategory(nestedCategory).Wait();
+            GetAndPrintCategories(catalogService).Wait();
 
-            //Delete tests turned off
-            //Console.WriteLine($"Deleting category with id = {id+1}");
-            //catalogService.DeleteCategory(id+1);
-            //GetAndPrintCategories(catalogService);
-            //Console.WriteLine($"Deleting category with id = {id}");
-            //catalogService.DeleteCategory(id);
-            //GetAndPrintCategories(catalogService);
+            CleanupCategories(catalogService).Wait();
 
             Console.WriteLine("Categories methods test completed");
 
-            Console.WriteLine("Products methods");
+            //Console.WriteLine("Products methods");
 
-            Console.WriteLine("Listing products");
-            GetAndPrintProducts(catalogService);
-
-            Console.WriteLine("Adding product");
-            var product = new ProductItem { Name = "Soap", Description = "Regular hygienic soap", Image = "http://localhost/soap.png", Category = category, Amount = 2, Price = 12.5m };
-            catalogService.AddProduct(product);
-            GetAndPrintProducts(catalogService);
-
-            id = 1; //todo: dynamic unique id from db
-
-            Console.WriteLine("Modifying product");
-            product = catalogService.GetProduct(id).Result;
-            product.Price = 16.25m;
-            catalogService.UpdateProduct(product);
-            GetAndPrintProducts(catalogService);
-
-            //Console.WriteLine($"Deleting product with id = {id}");
-            //catalogService.DeleteProduct(id);
+            //Console.WriteLine("Listing products");
             //GetAndPrintProducts(catalogService);
 
-            Console.WriteLine("Products methods test completed");
+            //Console.WriteLine("Adding product");
+            //var product = new ProductItem { Name = "Soap", Description = "Regular hygienic soap", Image = "http://localhost/soap.png", Category = category, Amount = 2, Price = 12.5m };
+            //catalogService.AddProduct(product);
+            //GetAndPrintProducts(catalogService);
+
+            //id = 1; //todo: dynamic unique id from db
+
+            //Console.WriteLine("Modifying product");
+            //product = catalogService.GetProduct(id).Result;
+            //product.Price = 16.25m;
+            //catalogService.UpdateProduct(product);
+            //GetAndPrintProducts(catalogService);
+
+            ////Console.WriteLine($"Deleting product with id = {id}");
+            ////catalogService.DeleteProduct(id);
+            ////GetAndPrintProducts(catalogService);
+
+            //Console.WriteLine("Products methods test completed");
         }
     }
 }

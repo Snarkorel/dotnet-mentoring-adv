@@ -1,10 +1,11 @@
 ﻿using CatalogService.Core.Interfaces;
 using CatalogService.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace CatalogService.Data.Repositories
 {
-    public abstract class GenericRepository<TEntity> : IRepository<TEntity> where TEntity : DbEntity
+    public abstract class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : DbEntity
     {
         private readonly DbContext _context;
         
@@ -14,61 +15,78 @@ namespace CatalogService.Data.Repositories
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
         
-        public virtual TEntity Get(int id)
+        public TEntity Get(int id)
         {
-            return _context.Find<TEntity>(id) ?? throw new InvalidOperationException($"Object with id={id} not found in DB");
+            return _context.Set<TEntity>().FirstOrDefault(x => x.Id == id) ?? throw new InvalidOperationException($"Object with id={id} not found in DB");
         }
 
         public async Task<TEntity> GetAsync(int id)
         {
-            return await _context.FindAsync<TEntity>(id) ?? throw new InvalidOperationException($"Object with id={id} not found in DB");
+            return await _context.Set<TEntity>().FirstOrDefaultAsync(x => x.Id == id) ?? throw new InvalidOperationException($"Object with id={id} not found in DB");
         }
 
-        public virtual IEnumerable<TEntity> List()
+        public IEnumerable<TEntity> List()
         {
-            return _context.Set<TEntity>();
+            return _context.Set<TEntity>().AsNoTracking();
         }
 
         public async Task<IEnumerable<TEntity>> ListAsync()
         {
-            return await _context.Set<TEntity>().ToListAsync();
+            return await _context.Set<TEntity>().AsNoTracking().ToListAsync();
         }
 
-        public virtual void Add(TEntity item)
+        public void Add(TEntity item)
         {
-            _context.Add(item);
+            _context.Set<TEntity>().AddAsync(item);
             _context.SaveChanges();
         }
 
-        public virtual async Task AddAsync(TEntity item)
+        public async Task AddAsync(TEntity item)
         {
-            await _context.AddAsync(item);
+            await _context.Set<TEntity>().AddAsync(item);
             await _context.SaveChangesAsync();
         }
 
-        public virtual void Update(TEntity item)
+        public void Update(TEntity item)
         {
-            _context.Update(item);
+            if (item == null) throw new ArgumentNullException(nameof(item));
+            _context.Set<TEntity>().Update(item);
             _context.SaveChanges();
         }
 
-        public virtual async Task UpdateAsync(TEntity item)
+        public async Task UpdateAsync(TEntity item)
         {
-            _context.Update(item);
+            if (item == null) throw new ArgumentNullException(nameof(item));
+
+            //workaround for mapping - detach old tracked entitiy and attach a new one
+            if (_context.Entry(item).State == EntityState.Detached)
+            {
+                var attachedEntity = _context.Set<TEntity>()
+                    .Local
+                    .FirstOrDefault(entry => entry.Id.Equals(item.Id));
+                if (attachedEntity != null)
+                {
+                    // detach
+                    _context.Entry(attachedEntity).State = EntityState.Detached;
+                }
+            }
+            _context.Entry(item).State = EntityState.Modified;
+            
+            //_context.Set<TEntity>().Update(item);
             await _context.SaveChangesAsync();
         }
         
-        public virtual void Delete(int id)
+        public void Delete(int id)
         {
             var entity = Get(id);
-            _context.Remove(entity);
+            _context.Set<TEntity>().Remove(entity);
             _context.SaveChanges();
         }
 
-        public virtual async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
-            var entity = GetAsync(id);
-            _context.Remove(entity);
+            var entity = await GetAsync(id);
+            _context.Set<TEntity>().Remove(entity);
             await _context.SaveChangesAsync();
         }
     }

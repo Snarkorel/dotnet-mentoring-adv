@@ -9,6 +9,7 @@ namespace CatalogService.Data.Mappers
         {
             return new ProductItem
             {
+                Id = product.Id,
                 Name = product.Name,
                 Description = product.Description,
                 Image = product.Image,
@@ -22,10 +23,11 @@ namespace CatalogService.Data.Mappers
         {
             return new Product
             {
+                Id = item.Id,
                 Name = item.Name,
                 Description = item.Description,
                 Image = item.Image,
-                Category = item.Category.ToCategory(),
+                CategoryId = item.Category.Id,
                 Price = item.Price,
                 Amount = item.Amount
             };
