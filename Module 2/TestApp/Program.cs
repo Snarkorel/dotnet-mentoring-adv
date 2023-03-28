@@ -83,7 +83,7 @@ namespace TestApp
         private static void PrintCategory(CategoryItem item)
         {
             Console.WriteLine(
-                $"[Category]\r\nName = {item.Name}\r\nImage = {item.Image}\r\nParent Category Id = {item.ParentCategoryId}\r\nParent Category = {item.ParentCategory}");
+                $"[Category]\r\nName = {item.Name}\r\nImage = {item.Image}\r\nParent Category Id = {item.ParentCategory?.Id}\r\nParent Category = {item.ParentCategory}");
         }
 
         private static void PrintCategories(IEnumerable<CategoryItem> items)
@@ -141,7 +141,7 @@ namespace TestApp
             GetAndPrintCategories(catalogService);
 
             Console.WriteLine("Adding category");
-            var category = new CategoryItem {Name = "Main category", Image = "http://localhost/img.png", ParentCategory = null, ParentCategoryId = null};
+            var category = new CategoryItem {Name = "Main category", Image = "http://localhost/img.png", ParentCategory = null};
             catalogService.AddCategory(category);
             GetAndPrintCategories(catalogService);
 
@@ -158,8 +158,7 @@ namespace TestApp
             {
                 Name = "Child category",
                 Image = "http://127.0.0.1/logo.png",
-                ParentCategory = category,
-                ParentCategoryId = id
+                ParentCategory = category
             };
             catalogService.AddCategory(nestedCategory);
             GetAndPrintCategories(catalogService);
