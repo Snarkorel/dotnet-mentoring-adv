@@ -12,13 +12,13 @@ namespace CatalogService.Data.Repositories
         
         public async Task<ProductItem> GetProductAsync(int id)
         {
-            var product = await GetAsync(id);
+            var product = await _context.Set<Product>().Include(p => p.Category).FirstOrDefaultAsync(x => x.Id == id) ?? throw new InvalidOperationException($"Object with id={id} not found in DB");
             return product.ToProductItem();
         }
 
         public async Task<IEnumerable<ProductItem>> ListProductsAsync()
         {
-            var products = await ListAsync();
+            var products = await _context.Set<Product>().Include(p => p.Category).AsNoTracking().ToListAsync();
             return products.Select(x => x.ToProductItem());
         }
 

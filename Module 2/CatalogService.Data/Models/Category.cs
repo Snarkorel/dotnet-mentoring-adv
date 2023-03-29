@@ -12,10 +12,10 @@ namespace CatalogService.Data.Models
 
         [DataType(DataType.ImageUrl)]
         public string? Image { get; set; }
-
-        [ForeignKey("ParentCategory")]
+        
         public int? ParentCategoryId { get; set; }
 
-        public Category? ParentCategory { get; set; }
+        [ForeignKey("ParentCategoryId")]
+        public virtual Category? ParentCategory { get; set; }
     }
 }
