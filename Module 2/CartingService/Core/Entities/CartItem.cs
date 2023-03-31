@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CartingService.Entities
+namespace CartingService.Core.Entities
 {
     public class CartItem
     {
@@ -8,9 +8,9 @@ namespace CartingService.Entities
         public int Id { get; set; }
         [Required]
         public string Name { get; set; }
-        public string Image { get; set; }
+        public Uri Image { get; set; }
         [Required]
-        public decimal Price {get; set; }
+        public decimal Price { get; set; }
         [Required]
         public int Quantity { get; set; }
     }
