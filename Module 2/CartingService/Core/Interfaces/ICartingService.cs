@@ -4,12 +4,12 @@ namespace CartingService.Core.Interfaces
 {
     public interface ICartingService
     {
-        void Initialize(int cartId);
+        Task CreateCart(int cartId);
 
-        IEnumerable<CartItem> GetItems();
+        Task<IEnumerable<CartItem>> GetItems();
 
-        bool AddItem(CartItem item);
+        Task<bool> AddItem(CartItem item);
 
-        bool Remove(int itemId);
+        Task<bool> RemoveItem(int itemId);
     }
 }

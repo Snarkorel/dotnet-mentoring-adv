@@ -1,6 +1,4 @@
 ﻿using CartingService.Core.Interfaces;
-using CartingService.Infrastructure.Interfaces;
-using CartingService.Infrastructure.LiteDB;
 using CartingService.Core.Entities;
 using CartingService.Infrastructure.Repositories;
 using CatalogService.Core.Interfaces;
@@ -17,7 +15,7 @@ namespace TestApp
         static void Main(string[] args)
         {
             Console.WriteLine("TestApp initialized");
-            //TestCartingService();
+            TestCartingService();
             TestCategoryService();
         }
 
@@ -35,9 +33,20 @@ namespace TestApp
             }
         }
 
-        private static void GetAndPrintItems(ICartingService service)
+        private static async Task DeleteItems(ICartingService service)
         {
-            var items = service.GetItems().ToArray();
+            Console.WriteLine("Removing items...");
+            var items = await service.GetItems();
+            foreach (var item in items)
+            {
+                Console.WriteLine($"Removing item with id={item.Id}");
+                await service.RemoveItem(item.Id);
+            }
+        }
+
+        private static async Task GetAndPrintItems(ICartingService service)
+        {
+            var items = await service.GetItems();
             PrintItems(items);
         }
 
@@ -47,7 +56,6 @@ namespace TestApp
 
             var serviceProvider = new ServiceCollection()
                 .AddLogging()
-                .AddSingleton<IDatabaseService<CartItem>, LiteDbDatabaseService<CartItem>>()
                 .AddSingleton<ICartItemRepository, CartItemRepository>()
                 .AddSingleton<ICartingService, CartingService.Core.CartingService>()
                 .BuildServiceProvider();
@@ -55,28 +63,35 @@ namespace TestApp
             var cartingService = serviceProvider.GetService<ICartingService>();
 
             Console.WriteLine("Initializing CartingService...");
-            cartingService.CreateCart(321);
+            //cartingService.CreateCart(321); //TODO: use later in module 3
 
             Console.WriteLine("Checking existing items in cart");
-            GetAndPrintItems(cartingService);
+            GetAndPrintItems(cartingService).Wait();
 
             Console.WriteLine("Adding new item");
             cartingService.AddItem(new CartItem
-                { Id = 1, Image = new Uri("https://google.com/logo.png"), Name = "testname", Price = 10.25m, Quantity = 1 });
+            {
+                Image = new Uri("https://google.com/logo.png"), 
+                Name = "testname", 
+                Price = 10.25m, 
+                Quantity = 1
+            });
 
-            GetAndPrintItems(cartingService);
+            GetAndPrintItems(cartingService).Wait();
 
             Console.WriteLine("Adding another item");
-            var item = new CartItem {Id = 2, Name = "Second test item", Price = 100.500m, Quantity = 15};
+            var item = new CartItem 
+            {
+                Name = "Second test item", 
+                Price = 100.500m, 
+                Quantity = 15
+
+            };
             cartingService.AddItem(item);
 
-            GetAndPrintItems(cartingService);
-
-            Console.WriteLine("Deleting items");
-            cartingService.RemoveItem(1);
-            cartingService.RemoveItem(2);
-
-            GetAndPrintItems(cartingService);
+            GetAndPrintItems(cartingService).Wait();
+            DeleteItems(cartingService).Wait();
+            GetAndPrintItems(cartingService).Wait();
         }
 
         private static void PrintCategory(CategoryItem item)

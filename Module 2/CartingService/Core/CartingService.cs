@@ -1,67 +1,41 @@
 ﻿using CartingService.Core.Entities;
 using CartingService.Core.Interfaces;
-using CartingService.Infrastructure.Interfaces;
 
 namespace CartingService.Core
 {
     public class CartingService : ICartingService
     {
-        private Cart _cart;
+        //TODO: cart repository with only get/add methods
         private readonly ICartItemRepository _repository;
 
-        //TODO: logging, exception processing (out of task's scope)
+        //TODO: logging, exception processing
         public CartingService(ICartItemRepository repository)
         {
             _repository = repository;
         }
 
-        public void Initialize(int cartId)
+        public async Task CreateCart(int cartId)
         {
-            if (_cart == null)
-                _cart = new Cart {Id = cartId};
+            //TODO: add method as required in module 3
+            throw new NotImplementedException();
         }
         
-        public IEnumerable<CartItem> GetItems()
+        public async Task<IEnumerable<CartItem>> GetItems()
         {
-            return _repository.GetItems();
+            return await _repository.GetItems();
         }
 
-        public bool AddItem(CartItem item)
+        public async Task<bool> AddItem(CartItem item)
         {
-            //validation
-            if (string.IsNullOrEmpty(item.Name))
-                return false;
-            
-            //business rules
-            if (ItemExists(item.Id))
-                IncreaseCountIfExists(item);
-            else
-                _repository.Add(item);
-
+            await _repository.Add(item);
             return true;
         }
 
-        public bool Remove(int itemId)
+        public async Task<bool> RemoveItem(int itemId)
         {
-            if (!ItemExists(itemId))
-                return false;
-
-            _repository.Delete(itemId);
+            await _repository.Delete(itemId);
             return true;
         }
-
-        private bool ItemExists(int id)
-        {
-            return GetItems().Any(x => x.Id == id);
-        }
-
-        private void IncreaseCountIfExists(CartItem item)
-        {
-            var existingItem = GetItems().First(x => x.Id == item.Id);
-            existingItem.Quantity += item.Quantity;
-            _repository.Update(existingItem);
-        }
-
         
     }
 }
