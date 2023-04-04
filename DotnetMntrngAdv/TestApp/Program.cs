@@ -2,6 +2,7 @@
 using CartingService.Core.Entities;
 using CartingService.Infrastructure.Repositories;
 using CatalogService.Core.Interfaces;
+using CatalogService.Core.Queries.Filters;
 using CatalogService.Data.Database;
 using CatalogService.Data.Repositories;
 using CatalogService.Domain.Entities;
@@ -267,6 +268,25 @@ namespace TestApp
             };
             catalogService.AddProduct(firstItem).Wait();
             catalogService.AddProduct(secondItem).Wait();
+
+            Console.WriteLine("Performing ListProductsPaged tests");
+            Console.WriteLine("Pagination test: Page number = 1, Page size = 1");
+            var filter = new ProductFilter {PageNumber = 1, PageSize = 1};
+            var products = catalogService.ListProductsPaged(filter).Result;
+            PrintProducts(products);
+
+            Console.WriteLine("Pagination test: Page number = 2, Page size = 1");
+            filter.PageNumber = 2;
+            products = catalogService.ListProductsPaged(filter).Result;
+            PrintProducts(products);
+
+            var firstProductId = catalogService.ListProducts().Result.Select(x => x.Id).First();
+            Console.WriteLine($"Pagination test: Page number = 1, Page size = 10, Id (filter) = {firstProductId}");
+            filter.ProductId = firstProductId;
+            filter.PageNumber = 1;
+            filter.PageSize = 10;
+            products = catalogService.ListProductsPaged(filter).Result;
+            PrintProducts(products);
 
             GetAndPrintCategories(catalogService).Wait();
             GetAndPrintProducts(catalogService).Wait();
