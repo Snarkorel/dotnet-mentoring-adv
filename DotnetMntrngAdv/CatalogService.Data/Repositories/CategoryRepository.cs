@@ -12,7 +12,11 @@ namespace CatalogService.Data.Repositories
 
         private async Task<Category> GetCategoryEntityAsync(int id)
         {
-            return await _context.Set<Category>().Include(c => c.ParentCategory).FirstOrDefaultAsync(x => x.Id == id) ?? throw new InvalidOperationException($"Object with id={id} not found in DB");
+            return await _context.Set<Category>()
+                .Include(c => c.ParentCategory)
+                .Include(c => c.Products)
+                .FirstOrDefaultAsync(x => x.Id == id)
+                   ?? throw new InvalidOperationException($"Object with id={id} not found in DB");
         }
 
         public async Task<CategoryItem> GetCategoryAsync(int id)
@@ -23,10 +27,14 @@ namespace CatalogService.Data.Repositories
 
         public async Task<IEnumerable<CategoryItem>> ListCategoriesAsync()
         {
-            var categories = await _context.Set<Category>().Include(c => c.ParentCategory).AsNoTracking().ToListAsync();
+            var categories = await _context.Set<Category>()
+                .Include(c => c.ParentCategory)
+                .Include(c => c.Products)
+                .AsNoTracking()
+                .ToListAsync();
             return categories.Select(x => x.ToCategoryItem());
         }
-
+        
         public async Task AddCategoryAsync(CategoryItem item)
         {
             await AddAsync(item.ToCategory());
@@ -47,7 +55,9 @@ namespace CatalogService.Data.Repositories
                 childCategory.ParentCategory = null;
             }
 
+            _context.RemoveRange(category.Products);
             _context.Set<Category>().Remove(category);
+
             await _context.SaveChangesAsync();
         }
     }
