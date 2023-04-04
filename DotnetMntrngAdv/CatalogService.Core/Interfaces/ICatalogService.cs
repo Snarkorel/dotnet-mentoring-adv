@@ -1,4 +1,6 @@
-﻿using CatalogService.Domain.Entities;
+﻿using CatalogService.Core.Queries.Filters;
+using CatalogService.Core.Queries.Results;
+using CatalogService.Domain.Entities;
 
 namespace CatalogService.Core.Interfaces
 {
@@ -7,7 +9,7 @@ namespace CatalogService.Core.Interfaces
         Task<CategoryItem> GetCategory(int id);
 
         Task<IEnumerable<CategoryItem>> ListCategories();
-
+        
         Task<bool> AddCategory(CategoryItem category);
 
         Task<bool> UpdateCategory(CategoryItem category);
@@ -17,6 +19,8 @@ namespace CatalogService.Core.Interfaces
         Task<ProductItem> GetProduct(int id);
 
         Task<IEnumerable<ProductItem>> ListProducts();
+
+        Task<PagedResult<ProductItem>> ListProductsPaged(ProductFilter filter);
 
         Task<bool> AddProduct(ProductItem product);
 

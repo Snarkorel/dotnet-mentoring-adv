@@ -1,5 +1,7 @@
 ﻿using CatalogService.Domain.Entities;
 using CatalogService.Core.Interfaces;
+using CatalogService.Core.Queries.Results;
+using CatalogService.Core.Queries.Filters;
 
 namespace CatalogService.Core
 {
@@ -54,6 +56,11 @@ namespace CatalogService.Core
         public async Task <IEnumerable<ProductItem>> ListProducts()
         {
             return await _productRepository.ListProductsAsync();
+        }
+
+        public async Task<PagedResult<ProductItem>> ListProductsPaged(ProductFilter filter)
+        {
+            return await _productRepository.ListProductsPaged(filter);
         }
 
         public async Task <bool> AddProduct(ProductItem product)
