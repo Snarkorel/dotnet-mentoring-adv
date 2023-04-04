@@ -16,7 +16,7 @@ namespace TestApp
         {
             Console.WriteLine("TestApp initialized");
             TestCartingService();
-            TestCategoryService();
+            TestCatalogService();
         }
 
         private static void PrintCartItem(CartItem item)
@@ -233,9 +233,60 @@ namespace TestApp
             Console.WriteLine("Products get/modify methods test completed");
         }
 
-        private static void TestCategoryService()
+        private static void TestProductsRemovalWithCategory(ICatalogService catalogService)
         {
-            Console.WriteLine("Testing Category Service");
+            Console.WriteLine("Testing Products removal on Category deletion");
+
+            Console.WriteLine("Listing products");
+            GetAndPrintProducts(catalogService).Wait();
+
+            Console.WriteLine("Creating category");
+            var newCategory = new CategoryItem
+            {
+                Name = "Some category"
+            };
+            catalogService.AddCategory(newCategory).Wait();
+            var category = catalogService.ListCategories().Result.First();
+            
+
+            Console.WriteLine("Creating and adding products");
+            var firstItem = new ProductItem
+            {
+                Name = "First item",
+                Price = 100m,
+                Amount = 1,
+                Category = category
+            };
+
+            var secondItem = new ProductItem
+            {
+                Name = "Second Item",
+                Price = 0.01m,
+                Amount = 2,
+                Category = category
+            };
+            catalogService.AddProduct(firstItem).Wait();
+            catalogService.AddProduct(secondItem).Wait();
+
+            GetAndPrintCategories(catalogService).Wait();
+            GetAndPrintProducts(catalogService).Wait();
+
+            Console.WriteLine("Removing all categories");
+            CleanupCategories(catalogService).Wait();
+
+            Console.WriteLine("Checking, if we still have products");
+            GetAndPrintProducts(catalogService).Wait();
+        }
+
+        private static void CatalogServiceCleanup(ICatalogService catalogService)
+        {
+            CleanupProducts(catalogService).Wait();
+            CleanupCategories(catalogService).Wait();
+        }
+
+        private static void TestCatalogService()
+        {
+            Console.WriteLine("Testing Catalog Service");
 
             var serviceProvider = new ServiceCollection()
                 .AddDbContext<DbContext, CatalogContext>(ServiceLifetime.Transient)
@@ -249,8 +300,11 @@ namespace TestApp
             TestCategories(catalogService);
             TestProducts(catalogService);
 
-            CleanupProducts(catalogService).Wait();
-            CleanupCategories(catalogService).Wait();
+            CatalogServiceCleanup(catalogService);
+
+            TestProductsRemovalWithCategory(catalogService);
+
+            CatalogServiceCleanup(catalogService);
         }
     }
 }
