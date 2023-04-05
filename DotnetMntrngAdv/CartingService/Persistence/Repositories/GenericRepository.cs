@@ -9,7 +9,7 @@ namespace CartingService.Infrastructure.Repositories
         //Actually, LiteDB doesn't support asynchronous approach, so it faked here
         //Let's imagine that we're taking this string from the config
         private static readonly string _connectionString = $"filename={Assembly.GetExecutingAssembly().Location}.LiteDb.db;journal=false";
-        private readonly ILiteCollection<TEntity> _collection;
+        protected readonly ILiteCollection<TEntity> _collection;
 
         protected GenericRepository()
         {

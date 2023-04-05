@@ -1,6 +1,6 @@
 ﻿using CartingService.Core.Interfaces;
 using CartingService.Core.Entities;
-using CartingService.Infrastructure.Repositories;
+using CartingService.Persistence.Repositories;
 using CatalogService.Core.Interfaces;
 using CatalogService.Core.Queries.Filters;
 using CatalogService.Data.Database;
@@ -17,7 +17,7 @@ namespace TestApp
         {
             Console.WriteLine("TestApp initialized");
             TestCartingService();
-            TestCatalogService();
+            //TestCatalogService();
         }
 
         private static void PrintCartItem(CartItem item)
@@ -34,21 +34,22 @@ namespace TestApp
             }
         }
 
-        private static async Task DeleteItems(ICartingService service)
+        private static async Task DeleteItems(ICartingService service, string cartKey)
         {
             Console.WriteLine("Removing items...");
-            var items = await service.GetItems();
-            foreach (var item in items)
+            var cart = await service.GetCartInfo(cartKey);
+            foreach (var item in cart.Items)
             {
                 Console.WriteLine($"Removing item with id={item.Id}");
-                await service.RemoveItem(item.Id);
+                await service.RemoveItem(cartKey, item.Id);
             }
         }
 
-        private static async Task GetAndPrintItems(ICartingService service)
+        private static async Task GetAndPrintItems(ICartingService service, string cartKey)
         {
-            var items = await service.GetItems();
-            PrintItems(items);
+            var cart = await service.GetCartInfo(cartKey);
+            Console.WriteLine($"Cart contents [key={cart.Key}]:");
+            PrintItems(cart.Items);
         }
 
         private static void TestCartingService()
@@ -57,42 +58,44 @@ namespace TestApp
 
             var serviceProvider = new ServiceCollection()
                 .AddLogging()
-                .AddSingleton<ICartItemRepository, CartItemRepository>()
+                .AddSingleton<ICartRepository, CartRepository>()
                 .AddSingleton<ICartingService, CartingService.Core.CartingService>()
                 .BuildServiceProvider();
 
             var cartingService = serviceProvider.GetService<ICartingService>();
 
-            Console.WriteLine("Initializing CartingService...");
-            //cartingService.CreateCart(321); //TODO: use later in module 3
-
-            Console.WriteLine("Checking existing items in cart");
-            GetAndPrintItems(cartingService).Wait();
-
-            Console.WriteLine("Adding new item");
-            cartingService.AddItem(new CartItem
+            var cartKey = "cart123";
+            var firstItem = new CartItem
             {
-                Image = new Uri("https://google.com/logo.png"), 
-                Name = "testname", 
-                Price = 10.25m, 
+                Image = new Uri("https://google.com/logo.png"),
+                Name = "testname",
+                Price = 10.25m,
                 Quantity = 1
-            });
-
-            GetAndPrintItems(cartingService).Wait();
+            };
+            Console.WriteLine($"Initializing cart [{cartKey} with one item]");
+            cartingService.AddItem(cartKey, firstItem).Wait();
+            GetAndPrintItems(cartingService, cartKey).Wait();
 
             Console.WriteLine("Adding another item");
-            var item = new CartItem 
+            var secondItem = new CartItem 
             {
                 Name = "Second test item", 
                 Price = 100.500m, 
                 Quantity = 15
 
             };
-            cartingService.AddItem(item);
+            cartingService.AddItem(cartKey, secondItem).Wait();
+            GetAndPrintItems(cartingService, cartKey).Wait();
 
-            GetAndPrintItems(cartingService).Wait();
-            DeleteItems(cartingService).Wait();
-            GetAndPrintItems(cartingService).Wait();
+            Console.WriteLine("Removing first item");
+            firstItem = cartingService.GetCartInfo(cartKey).Result.Items.First();
+            cartingService.RemoveItem(cartKey, firstItem.Id).Wait();
+            GetAndPrintItems(cartingService, cartKey).Wait();
+
+            Console.WriteLine("Removing second item");
+            secondItem = cartingService.GetCartInfo(cartKey).Result.Items.Last();
+            cartingService.RemoveItem(cartKey, secondItem.Id).Wait();
+            GetAndPrintItems(cartingService, cartKey).Wait();
         }
 
         private static void PrintCategory(CategoryItem item)
