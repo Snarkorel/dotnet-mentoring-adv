@@ -17,7 +17,7 @@ namespace TestApp
         {
             Console.WriteLine("TestApp initialized");
             TestCartingService();
-            //TestCatalogService();
+            TestCatalogService();
         }
 
         private static void PrintCartItem(CartItem item)
@@ -67,6 +67,7 @@ namespace TestApp
             var cartKey = "cart123";
             var firstItem = new CartItem
             {
+                Id = 1,
                 Image = new Uri("https://google.com/logo.png"),
                 Name = "testname",
                 Price = 10.25m,
@@ -79,6 +80,7 @@ namespace TestApp
             Console.WriteLine("Adding another item");
             var secondItem = new CartItem 
             {
+                Id = 2,
                 Name = "Second test item", 
                 Price = 100.500m, 
                 Quantity = 15
