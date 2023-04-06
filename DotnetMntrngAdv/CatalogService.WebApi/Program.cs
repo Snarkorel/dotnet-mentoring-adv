@@ -24,13 +24,13 @@ namespace CatalogService.WebApi
             app.MapGet("/category/{id}", GetCategory);
             app.MapPost("/category/", AddCategory);
             app.MapPut("/category/{id}", UpdateCategory);
-            //app.MapDelete("/category/{id}", DeleteCategory);
+            app.MapDelete("/category/{id}", DeleteCategory);
 
             app.MapGet("/items", GetAllItems);
             app.MapGet("/item/{id}", GetItem);
             app.MapPost("/item/", AddItem);
             app.MapPut("/item/{id}", UpdateItem);
-            //app.MapDelete("/item/{id}", DeleteItem);
+            app.MapDelete("/item/{id}", DeleteItem);
 
             app.Run();
         }
@@ -87,12 +87,22 @@ namespace CatalogService.WebApi
             }
         }
 
-        //private static async Task<IResult> DeleteCategory( ICatalogService catalogService, int id)
-        //{
-        //    throw new NotImplementedException();
-        //    //return TypedResults.Ok();
-        //    //return TypedResults.NotFound();
-        //}
+        private static async Task<IResult> DeleteCategory(ICatalogService catalogService, int id)
+        {
+            try
+            {
+                await catalogService.DeleteCategory(id);
+                return TypedResults.Ok();
+            }
+            catch (InvalidOperationException)
+            {
+                return TypedResults.NotFound();
+            }
+            catch (Exception ex)
+            {
+                return TypedResults.Problem(new ProblemDetails { Detail = ex.StackTrace, Title = ex.Message, Status = 500 });
+            }
+        }
 
         private static async Task<IResult> GetAllItems(ICatalogService catalogService, int pageNumber, int pageSize, int? categoryId)
         {
@@ -146,11 +156,21 @@ namespace CatalogService.WebApi
             }
         }
 
-        //private static async Task<IResult> DeleteItem(ICatalogService catalogService, int id)
-        //{
-        //    throw new NotImplementedException();
-        //    //return TypedResults.Ok();
-        //    //return TypedResults.NotFound();
-        //}
+        private static async Task<IResult> DeleteItem(ICatalogService catalogService, int id)
+        {
+            try
+            {
+                await catalogService.DeleteProduct(id);
+                return TypedResults.Ok();
+            }
+            catch (InvalidOperationException)
+            {
+                return TypedResults.NotFound();
+            }
+            catch (Exception ex)
+            {
+                return TypedResults.Problem(new ProblemDetails { Detail = ex.StackTrace, Title = ex.Message, Status = 500 });
+            }
+        }
     }
 }
