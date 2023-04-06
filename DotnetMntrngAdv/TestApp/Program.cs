@@ -287,7 +287,7 @@ namespace TestApp
 
             var firstProductId = catalogService.ListProducts().Result.Select(x => x.Id).First();
             Console.WriteLine($"Pagination test: Page number = 1, Page size = 10, Id (filter) = {firstProductId}");
-            filter.ProductId = firstProductId;
+            filter.CategoryId = category.Id;
             filter.PageNumber = 1;
             filter.PageSize = 10;
             products = catalogService.ListProductsPaged(filter).Result;

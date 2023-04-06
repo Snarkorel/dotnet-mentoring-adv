@@ -2,6 +2,6 @@
 {
     public class ProductFilter : PagedQuery
     {
-        public int? ProductId { get; set; }
+        public int? CategoryId { get; set; }
     }
 }

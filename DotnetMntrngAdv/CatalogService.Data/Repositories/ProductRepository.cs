@@ -30,9 +30,9 @@ namespace CatalogService.Data.Repositories
                 .Include(p => p.Category)
                 .AsNoTracking();
 
-            if (filter.ProductId != null)
+            if (filter.CategoryId != null)
             {
-                productsQueryable = productsQueryable.Where(c => c.Id == filter.ProductId);
+                productsQueryable = productsQueryable.Where(c => c.CategoryId == filter.CategoryId);
             }
 
             var mappedProducts = productsQueryable.Select(x => x.ToProductItem());
