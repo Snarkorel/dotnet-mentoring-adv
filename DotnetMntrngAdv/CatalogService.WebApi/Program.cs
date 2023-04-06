@@ -23,13 +23,13 @@ namespace CatalogService.WebApi
             app.MapGet("/categories", GetAllCategories);
             app.MapGet("/category/{id}", GetCategory);
             app.MapPost("/category/", AddCategory);
-            //app.MapPut("/category/{id}", UpdateCategory);
+            app.MapPut("/category/{id}", UpdateCategory);
             //app.MapDelete("/category/{id}", DeleteCategory);
 
             app.MapGet("/items", GetAllItems);
             app.MapGet("/item/{id}", GetItem);
             app.MapPost("/item/", AddItem);
-            //app.MapPut("/item/{id}", UpdateItem);
+            app.MapPut("/item/{id}", UpdateItem);
             //app.MapDelete("/item/{id}", DeleteItem);
 
             app.Run();
@@ -54,7 +54,7 @@ namespace CatalogService.WebApi
             catch (Exception ex) //Note: exception details exposed for debugging reasons
             {
                 return TypedResults.Problem(new ProblemDetails { Detail = ex.StackTrace, Title = ex.Message, Status = 500 });
-        }
+            }
         }
 
         private static async Task<IResult> AddCategory(ICatalogService catalogService, [FromBody] CategoryItem category)
@@ -70,12 +70,22 @@ namespace CatalogService.WebApi
             }
         }
 
-        //private static async Task<IResult> UpdateCategory(ICatalogService catalogService, CategoryItem category)
-        //{
-        //    throw new NotImplementedException();
-        //    //return TypedResults.NotFound();
-        //    //return TypedResults.NoContent();
-        //}
+        private static async Task<IResult> UpdateCategory(ICatalogService catalogService, [FromBody] CategoryItem category)
+        {
+            try
+            {
+                await catalogService.UpdateCategory(category);
+                return TypedResults.NoContent();
+            }
+            catch (InvalidOperationException)
+            {
+                return TypedResults.NotFound();
+            }
+            catch (Exception ex)
+            {
+                return TypedResults.Problem(new ProblemDetails { Detail = ex.StackTrace, Title = ex.Message, Status = 500 });
+            }
+        }
 
         //private static async Task<IResult> DeleteCategory( ICatalogService catalogService, int id)
         //{
@@ -103,7 +113,7 @@ namespace CatalogService.WebApi
             catch (Exception ex)
             {
                 return TypedResults.Problem(new ProblemDetails { Detail = ex.StackTrace, Title = ex.Message, Status = 500 });
-        }
+            }
         }
 
         private static async Task<IResult> AddItem(ICatalogService catalogService, [FromBody] ProductItem item)
@@ -119,12 +129,22 @@ namespace CatalogService.WebApi
             }
         }
 
-        //private static async Task<IResult> UpdateItem(ICatalogService catalogService, ProductItem item)
-        //{
-        //    throw new NotImplementedException();
-        //    //return TypedResults.NotFound();
-        //    //return TypedResults.NoContent();
-        //}
+        private static async Task<IResult> UpdateItem(ICatalogService catalogService, ProductItem item)
+        {
+            try
+            {
+                await catalogService.UpdateProduct(item);
+                return TypedResults.NoContent();
+            }
+            catch (ArgumentNullException)
+            {
+                return TypedResults.NotFound();
+            }
+            catch (Exception ex)
+            {
+                return TypedResults.Problem(new ProblemDetails { Detail = ex.StackTrace, Title = ex.Message, Status = 500 });
+            }
+        }
 
         //private static async Task<IResult> DeleteItem(ICatalogService catalogService, int id)
         //{
