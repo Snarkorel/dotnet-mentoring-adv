@@ -19,10 +19,10 @@ namespace CartingService.WebApi
                 .AddSingleton<ICartingService, Core.CartingService>()
                 .AddApiVersioning(options =>
                 {
-                    options.DefaultApiVersion = new ApiVersion(1, 0);
+                    options.DefaultApiVersion = new ApiVersion(2, 0);
                     options.ReportApiVersions = true;
                     options.AssumeDefaultVersionWhenUnspecified = true;
-                    options.ApiVersionReader = new HeaderApiVersionReader("api-version");
+                    options.ApiVersionReader = new MediaTypeApiVersionReader("version");
                 });
             var app = builder.Build();
             
@@ -37,22 +37,43 @@ namespace CartingService.WebApi
             app.MapGet("/cart/{key}", GetCartInfo)
                 .WithOpenApi()
                 .WithApiVersionSet(versionSet)
-                .MapToApiVersion(1, 0)
+                //.MapToApiVersion(1, 0)
+                .IsApiVersionNeutral() //TODO remove
+                .Produces<Cart>()
+                .WithName("GetCartInfo")
+                .WithDescription("Returns Cart model with items in it")
+                .WithTags("Getters")
+                .Produces(StatusCodes.Status404NotFound)
                 .WithOpenApi();
 
-            app.MapGet("/v2/cart/{key}", GetCartItems)
-                .WithApiVersionSet(versionSet)
-                .MapToApiVersion(2,0)
-                .WithOpenApi();
+            //app.MapGet("/v2/cart/{key}", GetCartItems)
+            //    .WithApiVersionSet(versionSet)
+            //    .MapToApiVersion(2,0)
+            //    .Produces<List<CartItem>>()
+            //    .WithName("GetCartItems")
+            //    .WithDescription("Returns cart items list")
+            //    .WithTags("Getters")
+            //    .Produces(StatusCodes.Status404NotFound)
+            //    .WithOpenApi();
 
             app.MapPost("/cart/{key}", AddItem)
                 .WithApiVersionSet(versionSet)
                 .IsApiVersionNeutral()
+                .Accepts<CartItem>("application/json")
+                .Produces<CartItem>()
+                .WithName("AddItem")
+                .WithDescription("Adds item to cart. If specified cart doesn't exist - creates it")
+                .WithTags("Setters")
+                .Produces(StatusCodes.Status500InternalServerError)
                 .WithOpenApi();
 
             app.MapDelete("/cart/{key}/{id}", DeleteItem)
                 .WithApiVersionSet(versionSet)
                 .IsApiVersionNeutral()
+                .WithName("DeleteItem")
+                .WithDescription("Deletes item from cart")
+                .WithTags("Setters")
+                .Produces(StatusCodes.Status500InternalServerError)
                 .WithOpenApi();
 
             app.UseSwagger();
