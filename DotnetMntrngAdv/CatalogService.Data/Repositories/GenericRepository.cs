@@ -35,10 +35,11 @@ namespace CatalogService.Data.Repositories
             return await _context.Set<TEntity>().AsNoTracking().ToListAsync();
         }
 
-        public async Task AddAsync(TEntity item)
+        public async Task<int> AddAsync(TEntity item)
         {
             await _context.Set<TEntity>().AddAsync(item);
             await _context.SaveChangesAsync();
+            return item.Id;
         }
 
         public async Task UpdateAsync(TEntity item)

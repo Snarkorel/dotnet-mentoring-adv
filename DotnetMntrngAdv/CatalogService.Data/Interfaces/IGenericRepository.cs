@@ -12,7 +12,7 @@ namespace CatalogService.Core.Interfaces
 
         Task<IEnumerable<TEntity>> ListAsync();
 
-        Task AddAsync(TEntity item);
+        Task<int> AddAsync(TEntity item);
 
         Task UpdateAsync(TEntity item);
 

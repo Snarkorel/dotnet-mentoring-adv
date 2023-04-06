@@ -12,7 +12,7 @@ namespace CatalogService.Core.Interfaces
 
         Task<PagedResult<ProductItem>> ListProductsPaged(ProductFilter filter);
 
-        Task AddProductAsync(ProductItem item);
+        Task<int> AddProductAsync(ProductItem item);
 
         Task UpdateProductAsync(ProductItem item);
 

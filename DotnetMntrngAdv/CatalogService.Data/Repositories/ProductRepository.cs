@@ -39,9 +39,9 @@ namespace CatalogService.Data.Repositories
             return await Task.FromResult(PagedResult<ProductItem>.ToPagedResult(mappedProducts, filter.PageNumber, filter.PageSize));
         }
 
-        public async Task AddProductAsync(ProductItem item)
+        public async Task<int> AddProductAsync(ProductItem item)
         {
-            await AddAsync(item.ToProduct());
+            return await AddAsync(item.ToProduct());
         }
 
         public async Task UpdateProductAsync(ProductItem item)

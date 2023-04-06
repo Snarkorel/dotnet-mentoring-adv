@@ -18,21 +18,20 @@ namespace CatalogService.Core
 
         //TODO: some business logic should be there in almost each method
 
-        public async Task <CategoryItem> GetCategory(int id)
+        public async Task<CategoryItem> GetCategory(int id)
         {
             var category = await _categoryRepository.GetCategoryAsync(id);
             return category;
         }
         
-        public async Task <IEnumerable<CategoryItem>> ListCategories()
+        public async Task<IEnumerable<CategoryItem>> ListCategories()
         {
             return await _categoryRepository.ListCategoriesAsync();
         }
 
-        public async Task<bool> AddCategory(CategoryItem category)
+        public async Task<int> AddCategory(CategoryItem category)
         {
-            await _categoryRepository.AddCategoryAsync(category);
-            return true;
+            return await _categoryRepository.AddCategoryAsync(category);
         }
 
         public async Task<bool> UpdateCategory(CategoryItem category)
@@ -53,7 +52,7 @@ namespace CatalogService.Core
             return product;
         }
 
-        public async Task <IEnumerable<ProductItem>> ListProducts()
+        public async Task<IEnumerable<ProductItem>> ListProducts()
         {
             return await _productRepository.ListProductsAsync();
         }
@@ -63,13 +62,12 @@ namespace CatalogService.Core
             return await _productRepository.ListProductsPaged(filter);
         }
 
-        public async Task <bool> AddProduct(ProductItem product)
+        public async Task<int> AddProduct(ProductItem product)
         {
-            await _productRepository.AddProductAsync(product);
-            return true;
+            return await _productRepository.AddProductAsync(product);
         }
 
-        public async Task <bool> UpdateProduct(ProductItem product)
+        public async Task<bool> UpdateProduct(ProductItem product)
         {
             await _productRepository.UpdateProductAsync(product);
             return true;

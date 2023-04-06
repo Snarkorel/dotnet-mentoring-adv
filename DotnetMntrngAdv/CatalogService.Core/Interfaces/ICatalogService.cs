@@ -10,7 +10,7 @@ namespace CatalogService.Core.Interfaces
 
         Task<IEnumerable<CategoryItem>> ListCategories();
         
-        Task<bool> AddCategory(CategoryItem category);
+        Task<int> AddCategory(CategoryItem category);
 
         Task<bool> UpdateCategory(CategoryItem category);
 
@@ -22,7 +22,7 @@ namespace CatalogService.Core.Interfaces
 
         Task<PagedResult<ProductItem>> ListProductsPaged(ProductFilter filter);
 
-        Task<bool> AddProduct(ProductItem product);
+        Task<int> AddProduct(ProductItem product);
 
         Task<bool> UpdateProduct(ProductItem product);
 

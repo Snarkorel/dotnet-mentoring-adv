@@ -35,9 +35,9 @@ namespace CatalogService.Data.Repositories
             return categories.Select(x => x.ToCategoryItem());
         }
         
-        public async Task AddCategoryAsync(CategoryItem item)
+        public async Task<int> AddCategoryAsync(CategoryItem item)
         {
-            await AddAsync(item.ToCategory());
+            return await AddAsync(item.ToCategory());
         }
 
         public async Task UpdateCategoryAsync(CategoryItem item)
