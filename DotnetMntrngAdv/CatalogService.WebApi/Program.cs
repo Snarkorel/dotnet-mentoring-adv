@@ -129,7 +129,7 @@ namespace CatalogService.WebApi
             }
         }
 
-        private static async Task<IResult> UpdateItem(ICatalogService catalogService, ProductItem item)
+        private static async Task<IResult> UpdateItem(ICatalogService catalogService, [FromBody] ProductItem item)
         {
             try
             {
