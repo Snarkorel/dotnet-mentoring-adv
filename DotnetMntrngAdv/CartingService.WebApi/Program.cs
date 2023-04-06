@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using CartingService.Core.Entities;
 using CartingService.Core.Interfaces;
 using CartingService.Persistence.Repositories;
@@ -12,19 +13,50 @@ namespace CartingService.WebApi
             var builder = WebApplication.CreateBuilder(args);
             builder.Services
                 .AddLogging()
+                .AddEndpointsApiExplorer()
+                .AddSwaggerGen()
                 .AddSingleton<ICartRepository, CartRepository>()
-                .AddSingleton<ICartingService, Core.CartingService>();
+                .AddSingleton<ICartingService, Core.CartingService>()
+                .AddApiVersioning(options =>
+                {
+                    options.DefaultApiVersion = new ApiVersion(1, 0);
+                    options.ReportApiVersions = true;
+                    options.AssumeDefaultVersionWhenUnspecified = true;
+                    options.ApiVersionReader = new HeaderApiVersionReader("api-version");
+                });
             var app = builder.Build();
-
-            //TODO: add Swagger
+            
             //TODO: add self-documentaion
 
-            app.MapGet("/cart/{key}", GetCartInfo);
-            //TODO: add versioning support
-            app.MapGet("/cart/{key}/TEMP", GetCartItems); //TODO
+            var versionSet = app.NewApiVersionSet()
+                .HasApiVersion(new ApiVersion(1, 0))
+                .HasApiVersion(new ApiVersion(2, 0))
+                .ReportApiVersions()
+                .Build();
 
-            app.MapPost("/cart/{key}", AddItem);
-            app.MapDelete("/cart/{key}/{id}", DeleteItem);
+            app.MapGet("/cart/{key}", GetCartInfo)
+                .WithOpenApi()
+                .WithApiVersionSet(versionSet)
+                .MapToApiVersion(1, 0)
+                .WithOpenApi();
+
+            app.MapGet("/v2/cart/{key}", GetCartItems)
+                .WithApiVersionSet(versionSet)
+                .MapToApiVersion(2,0)
+                .WithOpenApi();
+
+            app.MapPost("/cart/{key}", AddItem)
+                .WithApiVersionSet(versionSet)
+                .IsApiVersionNeutral()
+                .WithOpenApi();
+
+            app.MapDelete("/cart/{key}/{id}", DeleteItem)
+                .WithApiVersionSet(versionSet)
+                .IsApiVersionNeutral()
+                .WithOpenApi();
+
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.Run();
         }
