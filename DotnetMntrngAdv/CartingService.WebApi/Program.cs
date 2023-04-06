@@ -3,6 +3,7 @@ using CartingService.Core.Entities;
 using CartingService.Core.Interfaces;
 using CartingService.Persistence.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 
 namespace CartingService.WebApi
 {
@@ -14,7 +15,11 @@ namespace CartingService.WebApi
             builder.Services
                 .AddLogging()
                 .AddEndpointsApiExplorer()
-                .AddSwaggerGen()
+                .AddSwaggerGen(c =>
+                {
+                    c.SwaggerDoc("v1", new OpenApiInfo { Version = "v1", Title = "Carting Service API" });
+                    c.SwaggerDoc("v2", new OpenApiInfo { Version = "v2", Title = "Carting Service API" });
+                })
                 .AddSingleton<ICartRepository, CartRepository>()
                 .AddSingleton<ICartingService, Core.CartingService>()
                 .AddApiVersioning(options =>
@@ -22,23 +27,20 @@ namespace CartingService.WebApi
                     options.DefaultApiVersion = new ApiVersion(2, 0);
                     options.ReportApiVersions = true;
                     options.AssumeDefaultVersionWhenUnspecified = true;
-                    options.ApiVersionReader = new MediaTypeApiVersionReader("version");
+                    options.ApiVersionReader = new UrlSegmentApiVersionReader();
                 });
             var app = builder.Build();
             
-            //TODO: add self-documentaion
-
             var versionSet = app.NewApiVersionSet()
                 .HasApiVersion(new ApiVersion(1, 0))
                 .HasApiVersion(new ApiVersion(2, 0))
                 .ReportApiVersions()
                 .Build();
 
-            app.MapGet("/cart/{key}", GetCartInfo)
+            app.MapGet("/v1/cart/{key}", GetCartInfo)
                 .WithOpenApi()
                 .WithApiVersionSet(versionSet)
-                //.MapToApiVersion(1, 0)
-                .IsApiVersionNeutral() //TODO remove
+                .MapToApiVersion(1, 0)
                 .Produces<Cart>()
                 .WithName("GetCartInfo")
                 .WithDescription("Returns Cart model with items in it")
@@ -46,15 +48,15 @@ namespace CartingService.WebApi
                 .Produces(StatusCodes.Status404NotFound)
                 .WithOpenApi();
 
-            //app.MapGet("/v2/cart/{key}", GetCartItems)
-            //    .WithApiVersionSet(versionSet)
-            //    .MapToApiVersion(2,0)
-            //    .Produces<List<CartItem>>()
-            //    .WithName("GetCartItems")
-            //    .WithDescription("Returns cart items list")
-            //    .WithTags("Getters")
-            //    .Produces(StatusCodes.Status404NotFound)
-            //    .WithOpenApi();
+            app.MapGet("/v2/cart/{key}", GetCartItems)
+                .WithApiVersionSet(versionSet)
+                .MapToApiVersion(2, 0)
+                .Produces<List<CartItem>>()
+                .WithName("GetCartItems")
+                .WithDescription("Returns cart items list")
+                .WithTags("Getters")
+                .Produces(StatusCodes.Status404NotFound)
+                .WithOpenApi();
 
             app.MapPost("/cart/{key}", AddItem)
                 .WithApiVersionSet(versionSet)
@@ -77,7 +79,11 @@ namespace CartingService.WebApi
                 .WithOpenApi();
 
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint($"/swagger/v1/swagger.json", $"v1");
+                c.SwaggerEndpoint($"/swagger/v2/swagger.json", $"v2");
+            });
 
             app.Run();
         }
