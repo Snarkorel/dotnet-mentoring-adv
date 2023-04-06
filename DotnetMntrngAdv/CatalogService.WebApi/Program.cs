@@ -47,10 +47,14 @@ namespace CatalogService.WebApi
                 var category = await catalogService.GetCategory(id);
                 return TypedResults.Ok(category);
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
                 return TypedResults.NotFound();
             }
+            catch (Exception ex) //Note: exception details exposed for debugging reasons
+            {
+                return TypedResults.Problem(new ProblemDetails { Detail = ex.StackTrace, Title = ex.Message, Status = 500 });
+        }
         }
 
         private static async Task<IResult> AddCategory(ICatalogService catalogService, [FromBody] CategoryItem category)
@@ -96,6 +100,10 @@ namespace CatalogService.WebApi
             {
                 return TypedResults.NotFound();
             }
+            catch (Exception ex)
+            {
+                return TypedResults.Problem(new ProblemDetails { Detail = ex.StackTrace, Title = ex.Message, Status = 500 });
+        }
         }
 
         private static async Task<IResult> AddItem(ICatalogService catalogService, [FromBody] ProductItem item)
