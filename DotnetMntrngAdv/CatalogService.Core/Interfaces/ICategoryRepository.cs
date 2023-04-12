@@ -8,7 +8,7 @@ namespace CatalogService.Core.Interfaces
 
         Task<IEnumerable<CategoryItem>> ListCategoriesAsync();
 
-        Task AddCategoryAsync(CategoryItem item);
+        Task<int> AddCategoryAsync(CategoryItem item);
 
         Task UpdateCategoryAsync(CategoryItem item);
 

@@ -5,36 +5,26 @@ namespace CartingService.Core
 {
     public class CartingService : ICartingService
     {
-        //TODO: cart repository with only get/add methods
-        private readonly ICartItemRepository _repository;
+        private readonly ICartRepository _cartRepository;
 
-        //TODO: logging, exception processing
-        public CartingService(ICartItemRepository repository)
+        public CartingService(ICartRepository cartRepository)
         {
-            _repository = repository;
+            _cartRepository = cartRepository;
         }
 
-        public async Task CreateCart(int cartId)
+        public async Task<Cart> GetCartInfo(string key)
         {
-            //TODO: add method as required in module 3
-            throw new NotImplementedException();
-        }
-        
-        public async Task<IEnumerable<CartItem>> GetItems()
-        {
-            return await _repository.GetItems();
+            return await Task.FromResult(_cartRepository.GetCart(key));
         }
 
-        public async Task<bool> AddItem(CartItem item)
+        public async Task AddItem(string key, CartItem item)
         {
-            await _repository.Add(item);
-            return true;
+            await Task.Run(() => _cartRepository.AddItem(key, item));
         }
 
-        public async Task<bool> RemoveItem(int itemId)
+        public async Task RemoveItem(string key, int itemId)
         {
-            await _repository.Delete(itemId);
-            return true;
+            await Task.Run(() => _cartRepository.Delete(key, itemId));
         }
         
     }

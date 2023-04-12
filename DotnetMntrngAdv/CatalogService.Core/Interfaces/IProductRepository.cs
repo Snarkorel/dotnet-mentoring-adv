@@ -1,4 +1,6 @@
-﻿using CatalogService.Domain.Entities;
+﻿using CatalogService.Core.Queries.Filters;
+using CatalogService.Core.Queries.Results;
+using CatalogService.Domain.Entities;
 
 namespace CatalogService.Core.Interfaces
 {
@@ -8,7 +10,9 @@ namespace CatalogService.Core.Interfaces
 
         Task<IEnumerable<ProductItem>> ListProductsAsync();
 
-        Task AddProductAsync(ProductItem item);
+        Task<PagedResult<ProductItem>> ListProductsPaged(ProductFilter filter);
+
+        Task<int> AddProductAsync(ProductItem item);
 
         Task UpdateProductAsync(ProductItem item);
 

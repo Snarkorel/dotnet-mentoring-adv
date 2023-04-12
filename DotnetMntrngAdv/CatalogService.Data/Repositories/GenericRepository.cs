@@ -1,4 +1,5 @@
-﻿using CatalogService.Core.Interfaces;
+﻿using System.Linq.Expressions;
+using CatalogService.Core.Interfaces;
 using CatalogService.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,15 +20,26 @@ namespace CatalogService.Data.Repositories
             return await _context.Set<TEntity>().FirstOrDefaultAsync(x => x.Id == id) ?? throw new InvalidOperationException($"Object with id={id} not found in DB");
         }
 
+        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
+        {
+            return _context.Set<TEntity>().Where(predicate).AsEnumerable();
+        }
+
+        public async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await _context.Set<TEntity>().Where(predicate).ToListAsync();
+        }
+
         public async Task<IEnumerable<TEntity>> ListAsync()
         {
             return await _context.Set<TEntity>().AsNoTracking().ToListAsync();
         }
 
-        public async Task AddAsync(TEntity item)
+        public async Task<int> AddAsync(TEntity item)
         {
             await _context.Set<TEntity>().AddAsync(item);
             await _context.SaveChangesAsync();
+            return item.Id;
         }
 
         public async Task UpdateAsync(TEntity item)

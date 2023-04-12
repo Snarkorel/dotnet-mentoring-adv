@@ -95,12 +95,17 @@ namespace CatalogService.Data.Migrations
             modelBuilder.Entity("CatalogService.Data.Models.Product", b =>
                 {
                     b.HasOne("CatalogService.Data.Models.Category", "Category")
-                        .WithMany()
+                        .WithMany("Products")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("CatalogService.Data.Models.Category", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }
