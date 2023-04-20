@@ -6,6 +6,8 @@ using CatalogService.Core.Queries.Filters;
 using CatalogService.Data.Database;
 using CatalogService.Data.Repositories;
 using CatalogService.Domain.Entities;
+using Infrastructure.ServiceBus;
+using Infrastructure.ServiceBus.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -59,6 +61,7 @@ namespace TestApp
             var serviceProvider = new ServiceCollection()
                 .AddLogging()
                 .AddSingleton<ICartRepository, CartRepository>()
+                .AddSingleton<IMessagingClient, MessagingClient>()
                 .AddSingleton<ICartingService, CartingService.Core.CartingService>()
                 .BuildServiceProvider();
 
