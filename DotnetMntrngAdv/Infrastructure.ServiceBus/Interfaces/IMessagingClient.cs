@@ -1,12 +1,11 @@
-﻿using CartingService.Core.Entities;
-using CatalogService.Domain.Entities;
+﻿using Infrastructure.ServiceBus.DTO;
 
 namespace Infrastructure.ServiceBus.Interfaces
 {
     public interface IMessagingClient
     {
-        Task Send(ProductItem item);
+        Task Send(ItemDto item);
 
-        Task<CartItem?> Receive();
+        Task<ItemDto?> Receive();
     }
 }

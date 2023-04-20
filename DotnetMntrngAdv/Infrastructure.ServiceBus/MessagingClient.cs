@@ -1,7 +1,5 @@
 ﻿using Azure.Messaging.ServiceBus;
 using System.Text.Json;
-using CartingService.Core.Entities;
-using CatalogService.Domain.Entities;
 using Infrastructure.ServiceBus.Interfaces;
 using Infrastructure.ServiceBus.DTO;
 
@@ -25,16 +23,15 @@ namespace Infrastructure.ServiceBus
             _receiver = _client.CreateReceiver(QueueName);
         }
 
-        public async Task Send(ProductItem item)
+        public async Task Send(ItemDto dto)
         {
-            var dto = ItemDto.ToDto(item);
             var payload = JsonSerializer.Serialize(dto);
             var message = new ServiceBusMessage(payload);
 
             await _sender.SendMessageAsync(message);
         }
 
-        public async Task<CartItem?> Receive()
+        public async Task<ItemDto?> Receive()
         {
             var message = await _receiver.ReceiveMessageAsync();
             var payload = message.Body.ToString();
@@ -42,10 +39,7 @@ namespace Infrastructure.ServiceBus
                 return null;
 
             var dto = JsonSerializer.Deserialize<ItemDto>(payload);
-            if (dto == null)
-                return null;
-
-            return dto.ToCartItem();
+            return dto ?? null;
         }
     }
 }
