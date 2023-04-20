@@ -2,6 +2,7 @@
 using CatalogService.Core.Interfaces;
 using CatalogService.Core.Queries.Results;
 using CatalogService.Core.Queries.Filters;
+using Infrastructure.ServiceBus.Interfaces;
 
 namespace CatalogService.Core
 {
@@ -9,11 +10,13 @@ namespace CatalogService.Core
     {
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IMessagingClient _messagingClient;
 
-        public CatalogService(IProductRepository productRepository, ICategoryRepository categoryRepository)
+        public CatalogService(IProductRepository productRepository, ICategoryRepository categoryRepository, IMessagingClient messagingClient)
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
+            _messagingClient = messagingClient; 
         }
 
         //TODO: some business logic should be there in almost each method
@@ -77,6 +80,11 @@ namespace CatalogService.Core
         {
             await _productRepository.DeleteProductAsync(id);
             return true;
+        }
+
+        private void NotifyOfProductChanges(ProductItem item)
+        {
+            //TODO
         }
     }
 }
