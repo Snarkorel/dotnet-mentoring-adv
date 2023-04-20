@@ -3,6 +3,7 @@ using CatalogService.Core.Interfaces;
 using CatalogService.Core.Queries.Results;
 using CatalogService.Core.Queries.Filters;
 using Infrastructure.ServiceBus.Interfaces;
+using Infrastructure.ServiceBus.DTO;
 
 namespace CatalogService.Core
 {
@@ -73,6 +74,7 @@ namespace CatalogService.Core
         public async Task<bool> UpdateProduct(ProductItem product)
         {
             await _productRepository.UpdateProductAsync(product);
+            await NotifyOfProductChanges(product);
             return true;
         }
 
@@ -82,9 +84,22 @@ namespace CatalogService.Core
             return true;
         }
 
-        private void NotifyOfProductChanges(ProductItem item)
+        private async Task NotifyOfProductChanges(ProductItem item)
         {
-            //TODO
+            var dto = ProductToDto(item);
+            await _messagingClient.Send(dto);
+        }
+
+        private static ItemDto ProductToDto(ProductItem item)
+        {
+            return new ItemDto
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Image = item.Image ?? string.Empty,
+                Price = item.Price,
+                Quantity = (int)item.Amount
+            };
         }
     }
 }
