@@ -2,10 +2,10 @@
 {
     public class ItemDto
     {
-        int Id { get; set; }
-        string Name { get; set; }
-        string Image { get; set; }
-        decimal Price { get; set; }
-        int Quantity { get; set; }
+        public int Id { get; init; }
+        public string Name { get; init; }
+        public string Image { get; init; }
+        public decimal Price { get; init; }
+        public int Quantity { get; init; }
     }
 }
