@@ -4,6 +4,6 @@ namespace Infrastructure.ServiceBus.Interfaces
 {
     public interface IMessageListener
     {
-        Task Subscribe(Func<ItemDto> handler);
+        Task Subscribe(Action<ItemDto> handler);
     }
 }

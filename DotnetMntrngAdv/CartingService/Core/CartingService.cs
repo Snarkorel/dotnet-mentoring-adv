@@ -1,5 +1,6 @@
 ﻿using CartingService.Core.Entities;
 using CartingService.Core.Interfaces;
+using Infrastructure.ServiceBus.DTO;
 using Infrastructure.ServiceBus.Interfaces;
 
 namespace CartingService.Core
@@ -13,6 +14,7 @@ namespace CartingService.Core
         {
             _cartRepository = cartRepository;
             _messageListener = messageListener;
+            _messageListener.Subscribe(ProcessItemChanges);
         }
 
         public async Task<Cart> GetCartInfo(string key)
@@ -30,9 +32,23 @@ namespace CartingService.Core
             await Task.Run(() => _cartRepository.Delete(key, itemId));
         }
 
-        private void ProcessItemChanges()
+        private void ProcessItemChanges(ItemDto dto)
         {
-            //TODO
+            var item = DtoToCartItem(dto);
+
+            _cartRepository.UpdateItems(item);
+        }
+
+        private CartItem DtoToCartItem(ItemDto dto)
+        {
+            return new CartItem
+            {
+                Id = dto.Id,
+                Name = dto.Name,
+                Image = new Uri(dto.Image),
+                Price = dto.Price,
+                Quantity = dto.Quantity
+            };
         }
     }
 }
