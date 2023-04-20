@@ -320,6 +320,7 @@ namespace TestApp
                 .AddDbContext<DbContext, CatalogContext>(ServiceLifetime.Transient)
                 .AddSingleton<ICategoryRepository, CategoryRepository>()
                 .AddSingleton<IProductRepository, ProductRepository>()
+                .AddSingleton<IMessagingClient, MessagingClient>()
                 .AddSingleton<ICatalogService, CatalogService.Core.CatalogService>()
                 .BuildServiceProvider();
 
