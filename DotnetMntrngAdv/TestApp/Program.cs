@@ -10,6 +10,8 @@ using Infrastructure.ServiceBus;
 using Infrastructure.ServiceBus.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using CartingService.Core;
+using System.Globalization;
 
 namespace TestApp
 {
@@ -108,6 +110,16 @@ namespace TestApp
             Console.WriteLine("Removing second item");
             secondItem = cartingService.GetCartInfo(cartKey).Result.Items.Last();
             cartingService.RemoveItem(cartKey, secondItem.Id).Wait();
+            GetAndPrintItems(cartingService, cartKey).Wait();
+        }
+
+        private static async Task CartingServiceCleanup(ICartingService cartingService, string cartKey)
+        {
+            var items = cartingService.GetCartInfo(cartKey).Result.Items;
+            foreach (var item in items)
+            {
+                cartingService.RemoveItem(cartKey, item.Id).Wait();
+            }
             GetAndPrintItems(cartingService, cartKey).Wait();
         }
 
@@ -357,7 +369,43 @@ namespace TestApp
 
             var catalogService = GetCatalogService();
             var cartingService = GetCartingService();
-            //TODO
+
+            var cartName = "TestCart";
+            var category = new CategoryItem
+            {
+                Name = "Base category"
+            };
+            catalogService.AddCategory(category).Wait();
+            var product = new ProductItem
+            {
+                Name = "ServiceBusTest",
+                Image = "http://localhost/img.jpg",
+                Price = 10.20m,
+                Amount = 2,
+                Category = category
+            };
+            catalogService.AddProduct(product).Wait();
+            var actualProduct = catalogService.ListProducts().Result.First();
+
+            var cartItem = new CartItem
+            {
+                Id = actualProduct.Id,
+                Image = new Uri(actualProduct.Image),
+                Name = actualProduct.Name,
+                Price = actualProduct.Price,
+                Quantity = (int)actualProduct.Amount
+            };
+            cartingService.AddItem(cartName, cartItem).Wait();
+
+            actualProduct.Name = "Modified product test for ServiceBus";
+            catalogService.UpdateProduct(actualProduct).Wait();
+
+            Thread.Sleep(1000);
+
+            GetAndPrintItems(cartingService, cartName).Wait();
+
+            CatalogServiceCleanup(catalogService);
+            CartingServiceCleanup(cartingService, cartName).Wait();
         }
     }
 }
