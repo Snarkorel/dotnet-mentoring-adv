@@ -19,7 +19,7 @@ namespace CatalogService.WebApi
                 .AddDbContext<DbContext, CatalogContext>(ServiceLifetime.Transient)
                 .AddSingleton<ICategoryRepository, CategoryRepository>()
                 .AddSingleton<IProductRepository, ProductRepository>()
-                .AddSingleton<IMessagingClient, MessagingClient>()
+                .AddSingleton<IMessagePublisher, MessagePublisher>()
                 .AddSingleton<ICatalogService, Core.CatalogService>();
             var app = builder.Build();
 

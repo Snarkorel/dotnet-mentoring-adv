@@ -7,12 +7,12 @@ namespace CartingService.Core
     public class CartingService : ICartingService
     {
         private readonly ICartRepository _cartRepository;
-        private readonly IMessagingClient _messagingClient;
+        private readonly IMessageListener _messageListener;
 
-        public CartingService(ICartRepository cartRepository, IMessagingClient messagingClient)
+        public CartingService(ICartRepository cartRepository, IMessageListener messageListener)
         {
             _cartRepository = cartRepository;
-            _messagingClient = messagingClient;
+            _messageListener = messageListener;
         }
 
         public async Task<Cart> GetCartInfo(string key)
@@ -28,11 +28,6 @@ namespace CartingService.Core
         public async Task RemoveItem(string key, int itemId)
         {
             await Task.Run(() => _cartRepository.Delete(key, itemId));
-        }
-
-        private void CheckCatalogChanges()
-        {
-            //TODO
         }
 
         private void ProcessItemChanges()

@@ -61,7 +61,7 @@ namespace TestApp
             var serviceProvider = new ServiceCollection()
                 .AddLogging()
                 .AddSingleton<ICartRepository, CartRepository>()
-                .AddSingleton<IMessagingClient, MessagingClient>()
+                .AddSingleton<IMessageListener, MessageListener>()
                 .AddSingleton<ICartingService, CartingService.Core.CartingService>()
                 .BuildServiceProvider();
 
@@ -320,7 +320,7 @@ namespace TestApp
                 .AddDbContext<DbContext, CatalogContext>(ServiceLifetime.Transient)
                 .AddSingleton<ICategoryRepository, CategoryRepository>()
                 .AddSingleton<IProductRepository, ProductRepository>()
-                .AddSingleton<IMessagingClient, MessagingClient>()
+                .AddSingleton<IMessagePublisher, MessagePublisher>()
                 .AddSingleton<ICatalogService, CatalogService.Core.CatalogService>()
                 .BuildServiceProvider();
 

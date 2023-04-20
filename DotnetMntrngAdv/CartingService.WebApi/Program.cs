@@ -23,7 +23,7 @@ namespace CartingService.WebApi
                     c.SwaggerDoc("v2", new OpenApiInfo { Version = "v2", Title = "Carting Service API" });
                 })
                 .AddSingleton<ICartRepository, CartRepository>()
-                .AddSingleton<IMessagingClient, MessagingClient>()
+                .AddSingleton<IMessageListener, MessageListener>()
                 .AddSingleton<ICartingService, Core.CartingService>()
                 .AddApiVersioning(options =>
                 {

@@ -2,10 +2,8 @@
 
 namespace Infrastructure.ServiceBus.Interfaces
 {
-    public interface IMessagingClient
+    public interface IMessagePublisher
     {
         Task Send(ItemDto item);
-
-        Task<ItemDto?> Receive();
     }
 }
