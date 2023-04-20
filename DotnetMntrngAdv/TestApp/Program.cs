@@ -10,8 +10,6 @@ using Infrastructure.ServiceBus;
 using Infrastructure.ServiceBus.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using CartingService.Core;
-using System.Globalization;
 
 namespace TestApp
 {
@@ -376,13 +374,15 @@ namespace TestApp
                 Name = "Base category"
             };
             catalogService.AddCategory(category).Wait();
+            var actualCategory = catalogService.ListCategories().Result.First();
+
             var product = new ProductItem
             {
                 Name = "ServiceBusTest",
                 Image = "http://localhost/img.jpg",
                 Price = 10.20m,
                 Amount = 2,
-                Category = category
+                Category = actualCategory
             };
             catalogService.AddProduct(product).Wait();
             var actualProduct = catalogService.ListProducts().Result.First();
@@ -400,7 +400,7 @@ namespace TestApp
             actualProduct.Name = "Modified product test for ServiceBus";
             catalogService.UpdateProduct(actualProduct).Wait();
 
-            Thread.Sleep(1000);
+            Thread.Sleep(60000);
 
             GetAndPrintItems(cartingService, cartName).Wait();
 
