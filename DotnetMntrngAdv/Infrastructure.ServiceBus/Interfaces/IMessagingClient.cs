@@ -7,6 +7,6 @@ namespace Infrastructure.ServiceBus.Interfaces
     {
         Task Send(ProductItem item);
 
-        Task<CartItem> Receive();
+        Task<CartItem?> Receive();
     }
 }
