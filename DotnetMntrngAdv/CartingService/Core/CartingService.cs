@@ -1,15 +1,18 @@
 ﻿using CartingService.Core.Entities;
 using CartingService.Core.Interfaces;
+using Infrastructure.ServiceBus.Interfaces;
 
 namespace CartingService.Core
 {
     public class CartingService : ICartingService
     {
         private readonly ICartRepository _cartRepository;
+        private readonly IMessagingClient _messagingClient;
 
-        public CartingService(ICartRepository cartRepository)
+        public CartingService(ICartRepository cartRepository, IMessagingClient messagingClient)
         {
             _cartRepository = cartRepository;
+            _messagingClient = messagingClient;
         }
 
         public async Task<Cart> GetCartInfo(string key)
@@ -26,6 +29,15 @@ namespace CartingService.Core
         {
             await Task.Run(() => _cartRepository.Delete(key, itemId));
         }
-        
+
+        private void CheckCatalogChanges()
+        {
+            //TODO
+        }
+
+        private void ProcessItemChanges()
+        {
+            //TODO
+        }
     }
 }
