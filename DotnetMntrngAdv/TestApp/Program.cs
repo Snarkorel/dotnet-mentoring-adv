@@ -20,6 +20,7 @@ namespace TestApp
             Console.WriteLine("TestApp initialized");
             TestCartingService();
             TestCatalogService();
+            TestMessaging();
         }
 
         private static void PrintCartItem(CartItem item)
@@ -54,10 +55,8 @@ namespace TestApp
             PrintItems(cart.Items);
         }
 
-        private static void TestCartingService()
+        private static ICartingService GetCartingService()
         {
-            Console.WriteLine("Testing Carting Service");
-
             var serviceProvider = new ServiceCollection()
                 .AddLogging()
                 .AddSingleton<ICartRepository, CartRepository>()
@@ -66,6 +65,15 @@ namespace TestApp
                 .BuildServiceProvider();
 
             var cartingService = serviceProvider.GetService<ICartingService>();
+
+            return cartingService;
+        }
+
+        private static void TestCartingService()
+        {
+            Console.WriteLine("Testing Carting Service");
+
+            var cartingService = GetCartingService();
 
             var cartKey = "cart123";
             var firstItem = new CartItem
@@ -312,10 +320,8 @@ namespace TestApp
             CleanupCategories(catalogService).Wait();
         }
 
-        private static void TestCatalogService()
+        private static ICatalogService GetCatalogService()
         {
-            Console.WriteLine("Testing Catalog Service");
-
             var serviceProvider = new ServiceCollection()
                 .AddDbContext<DbContext, CatalogContext>(ServiceLifetime.Transient)
                 .AddSingleton<ICategoryRepository, CategoryRepository>()
@@ -326,6 +332,15 @@ namespace TestApp
 
             var catalogService = serviceProvider.GetService<ICatalogService>();
 
+            return catalogService;
+        }
+
+        private static void TestCatalogService()
+        {
+            Console.WriteLine("Testing Catalog Service");
+
+            var catalogService = GetCatalogService();
+
             TestCategories(catalogService);
             TestProducts(catalogService);
 
@@ -334,6 +349,15 @@ namespace TestApp
             TestProductsRemovalWithCategory(catalogService);
 
             CatalogServiceCleanup(catalogService);
+        }
+
+        private static void TestMessaging()
+        {
+            Console.WriteLine("Testing messaging");
+
+            var catalogService = GetCatalogService();
+            var cartingService = GetCartingService();
+            //TODO
         }
     }
 }
