@@ -3,6 +3,8 @@ using CatalogService.Core.Queries.Filters;
 using CatalogService.Data.Database;
 using CatalogService.Data.Repositories;
 using CatalogService.Domain.Entities;
+using Infrastructure.ServiceBus;
+using Infrastructure.ServiceBus.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +19,7 @@ namespace CatalogService.WebApi
                 .AddDbContext<DbContext, CatalogContext>(ServiceLifetime.Transient)
                 .AddSingleton<ICategoryRepository, CategoryRepository>()
                 .AddSingleton<IProductRepository, ProductRepository>()
+                .AddSingleton<IMessagingClient, MessagingClient>()
                 .AddSingleton<ICatalogService, Core.CatalogService>();
             var app = builder.Build();
 
