@@ -6,6 +6,8 @@ using CatalogService.Core.Queries.Filters;
 using CatalogService.Data.Database;
 using CatalogService.Data.Repositories;
 using CatalogService.Domain.Entities;
+using Infrastructure.ServiceBus;
+using Infrastructure.ServiceBus.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,6 +20,7 @@ namespace TestApp
             Console.WriteLine("TestApp initialized");
             TestCartingService();
             TestCatalogService();
+            TestMessaging();
         }
 
         private static void PrintCartItem(CartItem item)
@@ -52,17 +55,25 @@ namespace TestApp
             PrintItems(cart.Items);
         }
 
-        private static void TestCartingService()
+        private static ICartingService GetCartingService()
         {
-            Console.WriteLine("Testing Carting Service");
-
             var serviceProvider = new ServiceCollection()
                 .AddLogging()
                 .AddSingleton<ICartRepository, CartRepository>()
+                .AddSingleton<IMessageListener, MessageListener>()
                 .AddSingleton<ICartingService, CartingService.Core.CartingService>()
                 .BuildServiceProvider();
 
             var cartingService = serviceProvider.GetService<ICartingService>();
+
+            return cartingService;
+        }
+
+        private static void TestCartingService()
+        {
+            Console.WriteLine("Testing Carting Service");
+
+            var cartingService = GetCartingService();
 
             var cartKey = "cart123";
             var firstItem = new CartItem
@@ -97,6 +108,16 @@ namespace TestApp
             Console.WriteLine("Removing second item");
             secondItem = cartingService.GetCartInfo(cartKey).Result.Items.Last();
             cartingService.RemoveItem(cartKey, secondItem.Id).Wait();
+            GetAndPrintItems(cartingService, cartKey).Wait();
+        }
+
+        private static async Task CartingServiceCleanup(ICartingService cartingService, string cartKey)
+        {
+            var items = cartingService.GetCartInfo(cartKey).Result.Items;
+            foreach (var item in items)
+            {
+                cartingService.RemoveItem(cartKey, item.Id).Wait();
+            }
             GetAndPrintItems(cartingService, cartKey).Wait();
         }
 
@@ -309,18 +330,26 @@ namespace TestApp
             CleanupCategories(catalogService).Wait();
         }
 
-        private static void TestCatalogService()
+        private static ICatalogService GetCatalogService()
         {
-            Console.WriteLine("Testing Catalog Service");
-
             var serviceProvider = new ServiceCollection()
                 .AddDbContext<DbContext, CatalogContext>(ServiceLifetime.Transient)
                 .AddSingleton<ICategoryRepository, CategoryRepository>()
                 .AddSingleton<IProductRepository, ProductRepository>()
+                .AddSingleton<IMessagePublisher, MessagePublisher>()
                 .AddSingleton<ICatalogService, CatalogService.Core.CatalogService>()
                 .BuildServiceProvider();
 
             var catalogService = serviceProvider.GetService<ICatalogService>();
+
+            return catalogService;
+        }
+
+        private static void TestCatalogService()
+        {
+            Console.WriteLine("Testing Catalog Service");
+
+            var catalogService = GetCatalogService();
 
             TestCategories(catalogService);
             TestProducts(catalogService);
@@ -330,6 +359,53 @@ namespace TestApp
             TestProductsRemovalWithCategory(catalogService);
 
             CatalogServiceCleanup(catalogService);
+        }
+
+        private static void TestMessaging()
+        {
+            Console.WriteLine("Testing messaging");
+
+            var catalogService = GetCatalogService();
+            var cartingService = GetCartingService();
+
+            var cartName = "TestCart";
+            var category = new CategoryItem
+            {
+                Name = "Base category"
+            };
+            catalogService.AddCategory(category).Wait();
+            var actualCategory = catalogService.ListCategories().Result.First();
+
+            var product = new ProductItem
+            {
+                Name = "ServiceBusTest",
+                Image = "http://localhost/img.jpg",
+                Price = 10.20m,
+                Amount = 2,
+                Category = actualCategory
+            };
+            catalogService.AddProduct(product).Wait();
+            var actualProduct = catalogService.ListProducts().Result.First();
+
+            var cartItem = new CartItem
+            {
+                Id = actualProduct.Id,
+                Image = new Uri(actualProduct.Image),
+                Name = actualProduct.Name,
+                Price = actualProduct.Price,
+                Quantity = (int)actualProduct.Amount
+            };
+            cartingService.AddItem(cartName, cartItem).Wait();
+
+            actualProduct.Name = "Modified product test for ServiceBus";
+            catalogService.UpdateProduct(actualProduct).Wait();
+
+            Thread.Sleep(60000);
+
+            GetAndPrintItems(cartingService, cartName).Wait();
+
+            CatalogServiceCleanup(catalogService);
+            CartingServiceCleanup(cartingService, cartName).Wait();
         }
     }
 }

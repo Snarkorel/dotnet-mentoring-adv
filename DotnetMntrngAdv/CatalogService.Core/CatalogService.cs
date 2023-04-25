@@ -2,6 +2,8 @@
 using CatalogService.Core.Interfaces;
 using CatalogService.Core.Queries.Results;
 using CatalogService.Core.Queries.Filters;
+using Infrastructure.ServiceBus.Interfaces;
+using Infrastructure.ServiceBus.DTO;
 
 namespace CatalogService.Core
 {
@@ -9,11 +11,13 @@ namespace CatalogService.Core
     {
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IMessagePublisher _messagePublisher;
 
-        public CatalogService(IProductRepository productRepository, ICategoryRepository categoryRepository)
+        public CatalogService(IProductRepository productRepository, ICategoryRepository categoryRepository, IMessagePublisher messagePublisher)
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
+            _messagePublisher = messagePublisher; 
         }
 
         //TODO: some business logic should be there in almost each method
@@ -70,6 +74,7 @@ namespace CatalogService.Core
         public async Task<bool> UpdateProduct(ProductItem product)
         {
             await _productRepository.UpdateProductAsync(product);
+            await NotifyOfProductChanges(product);
             return true;
         }
 
@@ -77,6 +82,24 @@ namespace CatalogService.Core
         {
             await _productRepository.DeleteProductAsync(id);
             return true;
+        }
+
+        private async Task NotifyOfProductChanges(ProductItem item)
+        {
+            var dto = ProductToDto(item);
+            await _messagePublisher.Send(dto);
+        }
+
+        private static ItemDto ProductToDto(ProductItem item)
+        {
+            return new ItemDto
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Image = item.Image ?? string.Empty,
+                Price = item.Price,
+                Quantity = (int)item.Amount
+            };
         }
     }
 }

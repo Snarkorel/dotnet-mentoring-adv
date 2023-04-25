@@ -2,6 +2,8 @@ using Asp.Versioning;
 using CartingService.Core.Entities;
 using CartingService.Core.Interfaces;
 using CartingService.Persistence.Repositories;
+using Infrastructure.ServiceBus;
+using Infrastructure.ServiceBus.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 
@@ -21,6 +23,7 @@ namespace CartingService.WebApi
                     c.SwaggerDoc("v2", new OpenApiInfo { Version = "v2", Title = "Carting Service API" });
                 })
                 .AddSingleton<ICartRepository, CartRepository>()
+                .AddSingleton<IMessageListener, MessageListener>()
                 .AddSingleton<ICartingService, Core.CartingService>()
                 .AddApiVersioning(options =>
                 {

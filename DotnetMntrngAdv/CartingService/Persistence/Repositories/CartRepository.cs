@@ -15,6 +15,20 @@ namespace CartingService.Persistence.Repositories
             return cart;
         }
 
+        public void UpdateItems(CartItem item)
+        {
+            var carts = _collection.Find(c => c.Key != string.Empty);
+            foreach (var cart in carts)
+            {
+                if (cart.Items.All(x => x.Id != item.Id))
+                    continue;
+                var existing = cart.Items.First(i => i.Id == item.Id);
+                cart.Items.Remove(existing);
+                cart.Items.Add(item);
+                _collection.Update(cart);
+            }
+        }
+
         public void AddItem(string key, CartItem item)
         {
             var cart = _collection.Find(c => c.Key == key).ToList();
