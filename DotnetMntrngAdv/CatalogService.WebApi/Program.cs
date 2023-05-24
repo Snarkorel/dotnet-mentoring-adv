@@ -5,8 +5,13 @@ using CatalogService.Data.Repositories;
 using CatalogService.Domain.Entities;
 using Infrastructure.ServiceBus;
 using Infrastructure.ServiceBus.Interfaces;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CatalogService.WebApi
 {
@@ -15,13 +20,40 @@ namespace CatalogService.WebApi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services
+                .AddAuthentication(
+                    JwtBearerDefaults.AuthenticationScheme)
+                .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+
+            builder.Services.AddAuthorization();
+
             builder.Services
                 .AddDbContext<DbContext, CatalogContext>(ServiceLifetime.Transient)
                 .AddSingleton<ICategoryRepository, CategoryRepository>()
                 .AddSingleton<IProductRepository, ProductRepository>()
                 .AddSingleton<IMessagePublisher, MessagePublisher>()
                 .AddSingleton<ICatalogService, Core.CatalogService>();
+            
+            builder.Logging.AddDebug();
+            
             var app = builder.Build();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            //Custom token logging middleware from task 2
+            app.Use((context, next) =>
+            {
+                var token = context.Request.HttpContext.GetTokenAsync("access_token").Result;
+                if (!token.IsNullOrEmpty())
+                    //just dumb console logging
+                    Console.WriteLine($"Request token: {token}");
+
+                return next(context);
+            });
+            
+            app.MapGet("/", () => "Hello!");
 
             app.MapGet("/categories", GetAllCategories);
             app.MapGet("/category/{id}", GetCategory);
@@ -38,11 +70,13 @@ namespace CatalogService.WebApi
             app.Run();
         }
 
+        [Authorize(Roles = "Buyer,Manager")]
         private static async Task<IResult> GetAllCategories(ICatalogService catalogService)
         {
             return TypedResults.Ok(await catalogService.ListCategories());
         }
 
+        [Authorize(Roles = "Buyer,Manager")]
         private static async Task<IResult> GetCategory(ICatalogService catalogService, int id)
         {
             try
@@ -60,6 +94,7 @@ namespace CatalogService.WebApi
             }
         }
 
+        [Authorize(Roles = "Manager")]
         private static async Task<IResult> AddCategory(ICatalogService catalogService, [FromBody] CategoryItem category)
         {
             try
@@ -73,6 +108,7 @@ namespace CatalogService.WebApi
             }
         }
 
+        [Authorize(Roles = "Manager")]
         private static async Task<IResult> UpdateCategory(ICatalogService catalogService, [FromBody] CategoryItem category)
         {
             try
@@ -90,6 +126,7 @@ namespace CatalogService.WebApi
             }
         }
 
+        [Authorize(Roles = "Manager")]
         private static async Task<IResult> DeleteCategory(ICatalogService catalogService, int id)
         {
             try
