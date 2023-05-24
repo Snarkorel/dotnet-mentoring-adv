@@ -10,6 +10,10 @@ using Infrastructure.ServiceBus;
 using Infrastructure.ServiceBus.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Identity.Client;
+using System.Net.Http.Headers;
+using System.Net;
+using System.Text;
 
 namespace TestApp
 {
@@ -18,9 +22,10 @@ namespace TestApp
         static void Main(string[] args)
         {
             Console.WriteLine("TestApp initialized");
-            TestCartingService();
-            TestCatalogService();
-            TestMessaging();
+            //TestCartingService();
+            //TestCatalogService();
+            //TestMessaging();
+            TestCatalogServiceAuthorization();
         }
 
         private static void PrintCartItem(CartItem item)
@@ -406,6 +411,122 @@ namespace TestApp
 
             CatalogServiceCleanup(catalogService);
             CartingServiceCleanup(cartingService, cartName).Wait();
+        }
+
+        private static void TestBuyerAuthorization()
+        {
+            Console.WriteLine("Testing Buyer access");
+            
+            //Azure AD tenant ID
+            var tenantId = "<CHANGE_ME_TENANT>";
+            //WebAPI app registration client ID
+            var apiAppClientId = "CHANGE_ME_API_CLIENT_ID";
+            var scopes = new[] { $"api://{apiAppClientId}/.default" };
+            var authority = $"https://login.microsoftonline.com/{tenantId}";
+
+            //Client app registration client ID
+            var clientId = "CHANGE_ME_BUYER_CLIENT_ID";
+            //Client secret, obviously, shouldn't be hardcoded like this and should be retrieved securely, but for learning task it's OK
+            var clientSecret = "CHANGE_ME_BUYER_CLIENT_SECRET";
+            
+            var app = ConfidentialClientApplicationBuilder
+                .Create(clientId)
+                .WithAuthority(authority)
+                .WithClientSecret(clientSecret)
+                .Build();
+            var authResult = app.AcquireTokenForClient(scopes).ExecuteAsync().Result;
+
+            if (authResult != null)
+            {
+                Console.WriteLine("Access token: " + authResult.AccessToken);
+
+                var client = new HttpClient();
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", authResult.AccessToken);
+
+                var successUrl = "https://localhost:7021/categories";
+                var failUrl = "https://localhost:7021/category";
+
+                Console.WriteLine($"Calling {successUrl}");
+                string categoriesJson = client.GetStringAsync(successUrl).Result;
+                Console.WriteLine($"Server response:\r\n{categoriesJson}");
+
+                //This should fail - we don't have manager permissions
+                var category = "{\r\n\t\"name\": \"post category\",\r\n\t\"image\": \"http://localhost/img.png\",\r\n\t\"parentCategory\": null\r\n}";
+                var content = new StringContent(category, Encoding.UTF8, "application/json");
+                var responseCode = client.PostAsync(failUrl, content).Result.StatusCode;
+                if (responseCode == HttpStatusCode.Forbidden)
+                {
+                    Console.WriteLine(
+                        "Got 403 Forbidden response code while trying to do Manager-only action having Buyer permissions");
+                }
+                else
+                {
+                    Console.WriteLine($"Unexpected response code: {responseCode}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Failed to acquire token!");
+            }
+        }
+
+        private static void TestManagerAuthorization()
+        {
+            Console.WriteLine("Testing Manager access");
+
+            //Azure AD tenant ID
+            var tenantId = "<CHANGE_ME_TENANT>";
+            //WebAPI app registration client ID
+            var apiAppClientId = "CHANGE_ME_API_CLIENT_ID";
+            var scopes = new[] { $"api://{apiAppClientId}/.default" };
+            var authority = $"https://login.microsoftonline.com/{tenantId}";
+
+            //Client app registration client ID
+            var clientId = "CHANGE_ME_MANAGER_CLIENT_ID";
+            var clientSecret = "CHANGE_ME_MANAGER_CLIENT_SECRET";
+
+            var app = ConfidentialClientApplicationBuilder
+                .Create(clientId)
+                .WithAuthority(authority)
+                .WithClientSecret(clientSecret)
+                .Build();
+            var authResult = app.AcquireTokenForClient(scopes).ExecuteAsync().Result;
+
+            if (authResult != null)
+            {
+                Console.WriteLine("Access token: " + authResult.AccessToken);
+
+                var client = new HttpClient();
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", authResult.AccessToken);
+
+                var addCategoryUrl = "https://localhost:7021/category";
+                var getCategoriesUrl = "https://localhost:7021/categories";
+
+                var category = "{\r\n\t\"name\": \"post category\",\r\n\t\"image\": \"http://localhost/img.png\",\r\n\t\"parentCategory\": null\r\n}";
+                var content = new StringContent(category, Encoding.UTF8, "application/json");
+                Console.WriteLine($"Calling {addCategoryUrl}");
+                var response = client.PostAsync(addCategoryUrl, content).Result;
+
+                Console.WriteLine(response.IsSuccessStatusCode
+                    ? "Successfully added new category using Manager client app"
+                    : "Failed to add new category from Manager client app");
+
+                Console.WriteLine($"Calling {getCategoriesUrl}");
+                var categoriesJson = client.GetStringAsync(getCategoriesUrl).Result;
+                Console.WriteLine($"Server response:\r\n{categoriesJson}");
+            }
+            else
+            {
+                Console.WriteLine("Failed to acquire token!");
+            }
+        }
+
+        private static void TestCatalogServiceAuthorization()
+        {
+            TestBuyerAuthorization();
+            TestManagerAuthorization();
         }
     }
 }
