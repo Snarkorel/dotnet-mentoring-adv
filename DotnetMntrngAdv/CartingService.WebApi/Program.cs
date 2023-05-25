@@ -4,7 +4,10 @@ using CartingService.Core.Interfaces;
 using CartingService.Persistence.Repositories;
 using Infrastructure.ServiceBus;
 using Infrastructure.ServiceBus.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 
 namespace CartingService.WebApi
@@ -14,6 +17,14 @@ namespace CartingService.WebApi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services
+                .AddAuthentication(
+                    JwtBearerDefaults.AuthenticationScheme)
+                .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+
+            builder.Services.AddAuthorization();
+
             builder.Services
                 .AddLogging()
                 .AddEndpointsApiExplorer()
@@ -32,8 +43,14 @@ namespace CartingService.WebApi
                     options.AssumeDefaultVersionWhenUnspecified = true;
                     options.ApiVersionReader = new UrlSegmentApiVersionReader();
                 });
+
+            builder.Logging.AddDebug();
+
             var app = builder.Build();
-            
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             var versionSet = app.NewApiVersionSet()
                 .HasApiVersion(new ApiVersion(1, 0))
                 .HasApiVersion(new ApiVersion(2, 0))
@@ -91,6 +108,7 @@ namespace CartingService.WebApi
             app.Run();
         }
 
+        [Authorize(Roles = "Buyer,Manager")]
         //v1 method of GET /cart/{key}
         private static async Task<IResult> GetCartInfo(ICartingService service, string key)
         {
@@ -105,6 +123,7 @@ namespace CartingService.WebApi
             }
         }
 
+        [Authorize(Roles = "Buyer,Manager")]
         //v2 method of GET /cart/{key}
         private static async Task<IResult> GetCartItems(ICartingService service, string key)
         {
@@ -119,6 +138,7 @@ namespace CartingService.WebApi
             }
         }
 
+        [Authorize(Roles = "Buyer,Manager")]
         private static async Task<IResult> AddItem(ICartingService service, string key, [FromBody] CartItem item)
         {
             try
@@ -132,6 +152,7 @@ namespace CartingService.WebApi
             }
         }
 
+        [Authorize(Roles = "Buyer,Manager")]
         private static async Task<IResult> DeleteItem(ICartingService service, string key, int id)
         {
             try
