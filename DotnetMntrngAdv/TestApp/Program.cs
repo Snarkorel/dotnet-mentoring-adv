@@ -540,7 +540,7 @@ namespace TestApp
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", authResult.AccessToken);
 
-            var url = "https://localhost:7285/cart/testcart123";
+            var url = "https://localhost:7285/v1/cart/testcart123";
 
             Console.WriteLine($"Calling {url}");
             var response = client.GetAsync(url).Result;
