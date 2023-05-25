@@ -421,7 +421,7 @@ namespace TestApp
             //Azure AD tenant ID
             var tenantId = "<CHANGE_ME_TENANT>";
             //WebAPI app registration client ID
-            var apiAppClientId = "CHANGE_ME_API_CLIENT_ID";
+            var apiAppClientId = "CHANGE_ME_CATALOG_API_CLIENT_ID";
             var scopes = new[] { $"api://{apiAppClientId}/.default" };
             var authority = $"https://login.microsoftonline.com/{tenantId}";
 
@@ -479,7 +479,7 @@ namespace TestApp
             //Azure AD tenant ID
             var tenantId = "<CHANGE_ME_TENANT>";
             //WebAPI app registration client ID
-            var apiAppClientId = "CHANGE_ME_API_CLIENT_ID";
+            var apiAppClientId = "CHANGE_ME_CATALOG_API_CLIENT_ID";
             var scopes = new[] { $"api://{apiAppClientId}/.default" };
             var authority = $"https://login.microsoftonline.com/{tenantId}";
 
@@ -526,22 +526,106 @@ namespace TestApp
 
         private static void TestCatalogServiceAuthorization()
         {
+            Console.WriteLine("Testing Catalog Service authorization");
+
             TestCatalogBuyerAuthorization();
             TestCatalogManagerAuthorization();
         }
 
+        private static void TestCartingCommonFlow(AuthenticationResult authResult)
+        {
+            Console.WriteLine("Access token: " + authResult.AccessToken);
+
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", authResult.AccessToken);
+
+            var url = "https://localhost:7285/cart/testcart123";
+
+            Console.WriteLine($"Calling {url}");
+            var response = client.GetAsync(url).Result;
+            var responseCode = response.StatusCode;
+
+            if (responseCode is HttpStatusCode.OK or HttpStatusCode.NotFound)
+            {
+                Console.WriteLine($"Successfully completed request to server, response code: {responseCode}");
+                var content = response.Content.ReadAsStringAsync().Result;
+                Console.WriteLine($"Server response:\r\n{content}");
+            }
+            else
+            {
+                Console.WriteLine($"Request failed, response code: {responseCode}");
+            }
+        }
+
         private static void TestCartingBuyerAuthorization()
         {
-            //TODO
+            Console.WriteLine("Testing Buyer access");
+
+            //Azure AD tenant ID
+            var tenantId = "<CHANGE_ME_TENANT>";
+            //WebAPI app registration client ID
+            var apiAppClientId = "CHANGE_ME_CARTING_API_CLIENT_ID";
+            var scopes = new[] { $"api://{apiAppClientId}/.default" };
+            var authority = $"https://login.microsoftonline.com/{tenantId}";
+
+            //Client app registration client ID
+            var clientId = "CHANGE_ME_BUYER_CLIENT_ID";
+            var clientSecret = "CHANGE_ME_BUYER_CLIENT_SECRET";
+
+            var app = ConfidentialClientApplicationBuilder
+                .Create(clientId)
+                .WithAuthority(authority)
+                .WithClientSecret(clientSecret)
+                .Build();
+            var authResult = app.AcquireTokenForClient(scopes).ExecuteAsync().Result;
+            
+            if (authResult != null)
+            {
+                TestCartingCommonFlow(authResult);
+            }
+            else
+            {
+                Console.WriteLine("Failed to acquire token!");
+            }
         }
 
         private static void TestCartingManagerAuthorization()
         {
-            //TODO
+            Console.WriteLine("Testing Manager access");
+
+            //Azure AD tenant ID
+            var tenantId = "<CHANGE_ME_TENANT>";
+            //WebAPI app registration client ID
+            var apiAppClientId = "CHANGE_ME_CARTING_API_CLIENT_ID";
+            var scopes = new[] { $"api://{apiAppClientId}/.default" };
+            var authority = $"https://login.microsoftonline.com/{tenantId}";
+
+            //Client app registration client ID
+            var clientId = "CHANGE_ME_MANAGER_CLIENT_ID";
+            var clientSecret = "CHANGE_ME_MANAGER_CLIENT_SECRET";
+
+            var app = ConfidentialClientApplicationBuilder
+                .Create(clientId)
+                .WithAuthority(authority)
+                .WithClientSecret(clientSecret)
+                .Build();
+            var authResult = app.AcquireTokenForClient(scopes).ExecuteAsync().Result;
+
+            if (authResult != null)
+            {
+                TestCartingCommonFlow(authResult);
+            }
+            else
+            {
+                Console.WriteLine("Failed to acquire token!");
+            }
         }
 
         private static void TestCartingServiceAuthorization()
         {
+            Console.WriteLine("Testing Carting Service authorization");
+
             TestCartingBuyerAuthorization();
             TestCartingManagerAuthorization();
         }
