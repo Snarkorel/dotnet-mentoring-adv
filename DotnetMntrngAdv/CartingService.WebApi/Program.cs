@@ -4,10 +4,12 @@ using CartingService.Core.Interfaces;
 using CartingService.Persistence.Repositories;
 using Infrastructure.ServiceBus;
 using Infrastructure.ServiceBus.Interfaces;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 namespace CartingService.WebApi
@@ -50,6 +52,17 @@ namespace CartingService.WebApi
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            //Custom token logging middleware from task 2
+            app.Use((context, next) =>
+            {
+                var token = context.Request.HttpContext.GetTokenAsync("access_token").Result;
+                if (!token.IsNullOrEmpty())
+                    //just dumb console logging
+                    Console.WriteLine($"Request token: {token}");
+
+                return next(context);
+            });
 
             var versionSet = app.NewApiVersionSet()
                 .HasApiVersion(new ApiVersion(1, 0))

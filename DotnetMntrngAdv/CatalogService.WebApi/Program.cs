@@ -5,13 +5,11 @@ using CatalogService.Data.Repositories;
 using CatalogService.Domain.Entities;
 using Infrastructure.ServiceBus;
 using Infrastructure.ServiceBus.Interfaces;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Identity.Web;
-using Microsoft.IdentityModel.Tokens;
 
 namespace CatalogService.WebApi
 {
@@ -41,17 +39,6 @@ namespace CatalogService.WebApi
 
             app.UseAuthentication();
             app.UseAuthorization();
-
-            //Custom token logging middleware from task 2
-            app.Use((context, next) =>
-            {
-                var token = context.Request.HttpContext.GetTokenAsync("access_token").Result;
-                if (!token.IsNullOrEmpty())
-                    //just dumb console logging
-                    Console.WriteLine($"Request token: {token}");
-
-                return next(context);
-            });
             
             app.MapGet("/", () => "Hello!");
 
