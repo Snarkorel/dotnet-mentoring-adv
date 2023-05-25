@@ -26,6 +26,7 @@ namespace TestApp
             //TestCatalogService();
             //TestMessaging();
             TestCatalogServiceAuthorization();
+            TestCartingServiceAuthorization();
         }
 
         private static void PrintCartItem(CartItem item)
@@ -413,7 +414,7 @@ namespace TestApp
             CartingServiceCleanup(cartingService, cartName).Wait();
         }
 
-        private static void TestBuyerAuthorization()
+        private static void TestCatalogBuyerAuthorization()
         {
             Console.WriteLine("Testing Buyer access");
             
@@ -471,7 +472,7 @@ namespace TestApp
             }
         }
 
-        private static void TestManagerAuthorization()
+        private static void TestCatalogManagerAuthorization()
         {
             Console.WriteLine("Testing Manager access");
 
@@ -525,8 +526,24 @@ namespace TestApp
 
         private static void TestCatalogServiceAuthorization()
         {
-            TestBuyerAuthorization();
-            TestManagerAuthorization();
+            TestCatalogBuyerAuthorization();
+            TestCatalogManagerAuthorization();
+        }
+
+        private static void TestCartingBuyerAuthorization()
+        {
+            //TODO
+        }
+
+        private static void TestCartingManagerAuthorization()
+        {
+            //TODO
+        }
+
+        private static void TestCartingServiceAuthorization()
+        {
+            TestCartingBuyerAuthorization();
+            TestCartingManagerAuthorization();
         }
     }
 }
