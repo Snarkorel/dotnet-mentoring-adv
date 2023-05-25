@@ -540,16 +540,33 @@ namespace TestApp
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", authResult.AccessToken);
 
-            var url = "https://localhost:7285/v1/cart/testcart123";
+            var addItemUrl = "https://localhost:7285/cart/testcart123";
+            var getCartUrl = "https://localhost:7285/v2/cart/testcart123";
 
-            Console.WriteLine($"Calling {url}");
-            var response = client.GetAsync(url).Result;
-            var responseCode = response.StatusCode;
+            var item = "{\r\n\t\"name\": \"testname\",\r\n\t\"image\": \"https://google.com/logo.png\",\r\n\t\"price\": 10.25,\r\n\t\"quantity\": 1\r\n}";
+
+            var requestContent = new StringContent(item, Encoding.UTF8, "application/json");
+            Console.WriteLine($"Calling {addItemUrl}");
+            var addItemResponse = client.PostAsync(addItemUrl, requestContent).Result;
+
+            if (addItemResponse.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Successfully added new item to cart");
+            }
+            else
+            {
+                Console.WriteLine("Failed to add new item to cart, exiting...");
+                return;
+            }
+
+            Console.WriteLine($"Calling {getCartUrl}");
+            var getCartResponse = client.GetAsync(getCartUrl).Result;
+            var responseCode = getCartResponse.StatusCode;
 
             if (responseCode is HttpStatusCode.OK or HttpStatusCode.NotFound)
             {
                 Console.WriteLine($"Successfully completed request to server, response code: {responseCode}");
-                var content = response.Content.ReadAsStringAsync().Result;
+                var content = getCartResponse.Content.ReadAsStringAsync().Result;
                 Console.WriteLine($"Server response:\r\n{content}");
             }
             else
