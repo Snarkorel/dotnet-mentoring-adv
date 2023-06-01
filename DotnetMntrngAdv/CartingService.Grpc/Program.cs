@@ -1,4 +1,8 @@
+using CartingService.Core.Interfaces;
 using CartingService.Grpc.Services;
+using CartingService.Persistence.Repositories;
+using Infrastructure.ServiceBus;
+using Infrastructure.ServiceBus.Interfaces;
 
 namespace CartingService.Grpc
 {
@@ -12,12 +16,18 @@ namespace CartingService.Grpc
             // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
 
             // Add services to the container.
-            builder.Services.AddGrpc();
+            builder.Services
+                .AddGrpc();
+            
+            builder.Services
+                .AddSingleton<ICartRepository, CartRepository>()
+                .AddSingleton<IMessageListener, MessageListener>()
+                .AddSingleton<ICartingService, Core.CartingService>();
 
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            app.MapGrpcService<GreeterService>();
+            app.MapGrpcService<CartingGrpcService>();
             app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
             app.Run();
