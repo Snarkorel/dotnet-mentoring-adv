@@ -14,6 +14,7 @@ using Microsoft.Identity.Client;
 using System.Net.Http.Headers;
 using System.Net;
 using System.Text;
+using Grpc.Net.Client;
 
 namespace TestApp
 {
@@ -25,8 +26,9 @@ namespace TestApp
             //TestCartingService();
             //TestCatalogService();
             //TestMessaging();
-            TestCatalogServiceAuthorization();
-            TestCartingServiceAuthorization();
+            //TestCatalogServiceAuthorization();
+            //TestCartingServiceAuthorization();
+            TestGrpcService().Wait();
         }
 
         private static void PrintCartItem(CartItem item)
@@ -645,6 +647,19 @@ namespace TestApp
 
             TestCartingBuyerAuthorization();
             TestCartingManagerAuthorization();
+        }
+
+        private static async Task TestGrpcService()
+        {
+            //sample code from MSDN
+            
+            using var channel = GrpcChannel.ForAddress("https://localhost:7081");
+            var client = new Greeter.GreeterClient(channel);
+            var reply = await client.SayHelloAsync(
+                new HelloRequest { Name = "GreeterClient" });
+            Console.WriteLine("Greeting: " + reply.Message);
+
+            //TODO
         }
     }
 }
