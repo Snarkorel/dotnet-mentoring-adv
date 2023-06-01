@@ -20,15 +20,15 @@ namespace TestApp
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             Console.WriteLine("TestApp initialized");
-            //TestCartingService();
-            //TestCatalogService();
-            //TestMessaging();
-            //TestCatalogServiceAuthorization();
-            //TestCartingServiceAuthorization();
-            TestGrpcService().Wait();
+            await TestCartingService();
+            await TestCatalogService();
+            await TestMessaging();
+            await TestCatalogServiceAuthorization();
+            await TestCartingServiceAuthorization();
+            await TestGrpcService();
         }
 
         private static void PrintCartItem(CartItem item)
@@ -77,7 +77,7 @@ namespace TestApp
             return cartingService;
         }
 
-        private static void TestCartingService()
+        private static async Task TestCartingService()
         {
             Console.WriteLine("Testing Carting Service");
 
@@ -93,8 +93,8 @@ namespace TestApp
                 Quantity = 1
             };
             Console.WriteLine($"Initializing cart [{cartKey} with one item]");
-            cartingService.AddItem(cartKey, firstItem).Wait();
-            GetAndPrintItems(cartingService, cartKey).Wait();
+            await cartingService.AddItem(cartKey, firstItem);
+            await GetAndPrintItems(cartingService, cartKey);
 
             Console.WriteLine("Adding another item");
             var secondItem = new CartItem 
@@ -105,28 +105,31 @@ namespace TestApp
                 Quantity = 15
 
             };
-            cartingService.AddItem(cartKey, secondItem).Wait();
-            GetAndPrintItems(cartingService, cartKey).Wait();
+            await cartingService.AddItem(cartKey, secondItem);
+            await GetAndPrintItems(cartingService, cartKey);
 
             Console.WriteLine("Removing first item");
-            firstItem = cartingService.GetCartInfo(cartKey).Result.Items.First();
-            cartingService.RemoveItem(cartKey, firstItem.Id).Wait();
-            GetAndPrintItems(cartingService, cartKey).Wait();
+            var cartInfo = await cartingService.GetCartInfo(cartKey);
+            firstItem = cartInfo.Items.First();
+            await cartingService.RemoveItem(cartKey, firstItem.Id);
+            await GetAndPrintItems(cartingService, cartKey);
 
             Console.WriteLine("Removing second item");
-            secondItem = cartingService.GetCartInfo(cartKey).Result.Items.Last();
-            cartingService.RemoveItem(cartKey, secondItem.Id).Wait();
-            GetAndPrintItems(cartingService, cartKey).Wait();
+            cartInfo = await cartingService.GetCartInfo(cartKey);
+            secondItem = cartInfo.Items.Last();
+            await cartingService.RemoveItem(cartKey, secondItem.Id);
+            await GetAndPrintItems(cartingService, cartKey);
         }
 
         private static async Task CartingServiceCleanup(ICartingService cartingService, string cartKey)
         {
-            var items = cartingService.GetCartInfo(cartKey).Result.Items;
+            var cartInfo = await cartingService.GetCartInfo(cartKey);
+            var items = cartInfo.Items;
             foreach (var item in items)
             {
-                cartingService.RemoveItem(cartKey, item.Id).Wait();
+                await cartingService.RemoveItem(cartKey, item.Id);
             }
-            GetAndPrintItems(cartingService, cartKey).Wait();
+            await GetAndPrintItems(cartingService, cartKey);
         }
 
         private static void PrintCategory(CategoryItem item)
@@ -193,12 +196,12 @@ namespace TestApp
             }
         }
 
-        private static void TestCategories(ICatalogService catalogService)
+        private static async Task TestCategories(ICatalogService catalogService)
         {
             Console.WriteLine("Categories methods");
 
             Console.WriteLine("Listing categories");
-            GetAndPrintCategories(catalogService).Wait();
+            await GetAndPrintCategories(catalogService);
             
             Console.WriteLine("Adding category");
             var category = new CategoryItem
@@ -207,45 +210,48 @@ namespace TestApp
                 Image = "http://localhost/img.png", 
                 ParentCategory = null
             };
-            catalogService.AddCategory(category).Wait();
-            GetAndPrintCategories(catalogService).Wait();
+            await catalogService.AddCategory(category);
+            await GetAndPrintCategories(catalogService);
 
             Console.WriteLine("Modifying category");
-            var id = catalogService.ListCategories().Result.First().Id;
-            category = catalogService.GetCategory(id).Result;
+            var categories = await catalogService.ListCategories();
+            var id = categories.First().Id;
+            category = await catalogService.GetCategory(id);
             category.Image = "http://localhost/image.png";
-            catalogService.UpdateCategory(category).Wait();
-            GetAndPrintCategories(catalogService).Wait();
+            await catalogService.UpdateCategory(category);
+            await GetAndPrintCategories(catalogService);
 
             Console.WriteLine("Adding nested category");
             var parentCategory = new CategoryItem
             {
                 Name = "Parent category"
             };
-            catalogService.AddCategory(parentCategory).Wait();
+            await catalogService.AddCategory(parentCategory);
 
-            parentCategory = catalogService.ListCategories().Result.Last();
+            categories = await catalogService.ListCategories();
+            parentCategory = categories.Last();
             var nestedCategory = new CategoryItem
             {
                 Name = "Child category",
                 Image = "http://127.0.0.1/logo.png",
                 ParentCategory = parentCategory
             };
-            catalogService.AddCategory(nestedCategory).Wait();
-            GetAndPrintCategories(catalogService).Wait();
+            await catalogService.AddCategory(nestedCategory);
+            await GetAndPrintCategories(catalogService);
             
             Console.WriteLine("Categories get/modify methods test completed");
         }
 
-        private static void TestProducts(ICatalogService catalogService)
+        private static async Task TestProducts(ICatalogService catalogService)
         {
             Console.WriteLine("Products methods");
 
             Console.WriteLine("Listing products");
-            GetAndPrintProducts(catalogService).Wait();
+            await GetAndPrintProducts(catalogService);
             
             Console.WriteLine("Adding product");
-            var category = catalogService.ListCategories().Result.Last();
+            var categories = await catalogService.ListCategories();
+            var category = categories.Last();
             var product = new ProductItem
             {
                 Name = "Soap", 
@@ -255,33 +261,35 @@ namespace TestApp
                 Amount = 2,
                 Price = 12.5m
             };
-            catalogService.AddProduct(product).Wait();
-            GetAndPrintProducts(catalogService).Wait();
+            await catalogService.AddProduct(product);
+            await GetAndPrintProducts(catalogService);
             
             Console.WriteLine("Modifying product");
-            var id = catalogService.ListProducts().Result.First().Id;
-            product = catalogService.GetProduct(id).Result;
+            var products = await catalogService.ListProducts();
+            var id = products.First().Id;
+            product = await catalogService.GetProduct(id);
             product.Price = 16.25m;
-            catalogService.UpdateProduct(product).Wait();
-            GetAndPrintProducts(catalogService).Wait();
+            await catalogService.UpdateProduct(product);
+            await GetAndPrintProducts(catalogService);
 
             Console.WriteLine("Products get/modify methods test completed");
         }
 
-        private static void TestProductsRemovalWithCategory(ICatalogService catalogService)
+        private static async Task TestProductsRemovalWithCategory(ICatalogService catalogService)
         {
             Console.WriteLine("Testing Products removal on Category deletion");
 
             Console.WriteLine("Listing products");
-            GetAndPrintProducts(catalogService).Wait();
+            await GetAndPrintProducts(catalogService);
 
             Console.WriteLine("Creating category");
             var newCategory = new CategoryItem
             {
                 Name = "Some category"
             };
-            catalogService.AddCategory(newCategory).Wait();
-            var category = catalogService.ListCategories().Result.First();
+            await catalogService.AddCategory(newCategory);
+            var categories = await catalogService.ListCategories();
+            var category = categories.First();
             
 
             Console.WriteLine("Creating and adding products");
@@ -300,42 +308,43 @@ namespace TestApp
                 Amount = 2,
                 Category = category
             };
-            catalogService.AddProduct(firstItem).Wait();
-            catalogService.AddProduct(secondItem).Wait();
+            await catalogService.AddProduct(firstItem);
+            await catalogService.AddProduct(secondItem);
 
             Console.WriteLine("Performing ListProductsPaged tests");
             Console.WriteLine("Pagination test: Page number = 1, Page size = 1");
             var filter = new ProductFilter {PageNumber = 1, PageSize = 1};
-            var products = catalogService.ListProductsPaged(filter).Result;
-            PrintProducts(products);
+            var pagedProducts = await catalogService.ListProductsPaged(filter);
+            PrintProducts(pagedProducts);
 
             Console.WriteLine("Pagination test: Page number = 2, Page size = 1");
             filter.PageNumber = 2;
-            products = catalogService.ListProductsPaged(filter).Result;
-            PrintProducts(products);
+            pagedProducts = await catalogService.ListProductsPaged(filter);
+            PrintProducts(pagedProducts);
 
-            var firstProductId = catalogService.ListProducts().Result.Select(x => x.Id).First();
+            var products = await catalogService.ListProducts();
+            var firstProductId = products.Select(x => x.Id).First();
             Console.WriteLine($"Pagination test: Page number = 1, Page size = 10, Id (filter) = {firstProductId}");
             filter.CategoryId = category.Id;
             filter.PageNumber = 1;
             filter.PageSize = 10;
-            products = catalogService.ListProductsPaged(filter).Result;
-            PrintProducts(products);
+            pagedProducts = await catalogService.ListProductsPaged(filter);
+            PrintProducts(pagedProducts);
 
-            GetAndPrintCategories(catalogService).Wait();
-            GetAndPrintProducts(catalogService).Wait();
+            await GetAndPrintCategories(catalogService);
+            await GetAndPrintProducts(catalogService);
 
             Console.WriteLine("Removing all categories");
-            CleanupCategories(catalogService).Wait();
+            await CleanupCategories(catalogService);
 
             Console.WriteLine("Checking, if we still have products");
-            GetAndPrintProducts(catalogService).Wait();
+            await GetAndPrintProducts(catalogService);
         }
 
-        private static void CatalogServiceCleanup(ICatalogService catalogService)
+        private static async Task CatalogServiceCleanup(ICatalogService catalogService)
         {
-            CleanupProducts(catalogService).Wait();
-            CleanupCategories(catalogService).Wait();
+            await CleanupProducts(catalogService);
+            await CleanupCategories(catalogService);
         }
 
         private static ICatalogService GetCatalogService()
@@ -353,23 +362,23 @@ namespace TestApp
             return catalogService;
         }
 
-        private static void TestCatalogService()
+        private static async Task TestCatalogService()
         {
             Console.WriteLine("Testing Catalog Service");
 
             var catalogService = GetCatalogService();
 
-            TestCategories(catalogService);
-            TestProducts(catalogService);
+            await TestCategories(catalogService);
+            await TestProducts(catalogService);
 
-            CatalogServiceCleanup(catalogService);
+            await CatalogServiceCleanup(catalogService);
 
-            TestProductsRemovalWithCategory(catalogService);
+            await TestProductsRemovalWithCategory(catalogService);
 
-            CatalogServiceCleanup(catalogService);
+            await CatalogServiceCleanup(catalogService);
         }
 
-        private static void TestMessaging()
+        private static async Task TestMessaging()
         {
             Console.WriteLine("Testing messaging");
 
@@ -381,8 +390,9 @@ namespace TestApp
             {
                 Name = "Base category"
             };
-            catalogService.AddCategory(category).Wait();
-            var actualCategory = catalogService.ListCategories().Result.First();
+            await catalogService.AddCategory(category);
+            var categories = await catalogService.ListCategories();
+            var actualCategory = categories.First();
 
             var product = new ProductItem
             {
@@ -392,8 +402,9 @@ namespace TestApp
                 Amount = 2,
                 Category = actualCategory
             };
-            catalogService.AddProduct(product).Wait();
-            var actualProduct = catalogService.ListProducts().Result.First();
+            await catalogService.AddProduct(product);
+            var products = await catalogService.ListProducts();
+            var actualProduct = products.First();
 
             var cartItem = new CartItem
             {
@@ -403,20 +414,20 @@ namespace TestApp
                 Price = actualProduct.Price,
                 Quantity = (int)actualProduct.Amount
             };
-            cartingService.AddItem(cartName, cartItem).Wait();
+            await cartingService.AddItem(cartName, cartItem);
 
             actualProduct.Name = "Modified product test for ServiceBus";
-            catalogService.UpdateProduct(actualProduct).Wait();
+            await catalogService.UpdateProduct(actualProduct);
 
             Thread.Sleep(60000);
 
-            GetAndPrintItems(cartingService, cartName).Wait();
+            await GetAndPrintItems(cartingService, cartName);
 
-            CatalogServiceCleanup(catalogService);
-            CartingServiceCleanup(cartingService, cartName).Wait();
+            await CatalogServiceCleanup(catalogService);
+            await CartingServiceCleanup(cartingService, cartName);
         }
 
-        private static void TestCatalogBuyerAuthorization()
+        private static async Task TestCatalogBuyerAuthorization()
         {
             Console.WriteLine("Testing Buyer access");
             
@@ -437,7 +448,7 @@ namespace TestApp
                 .WithAuthority(authority)
                 .WithClientSecret(clientSecret)
                 .Build();
-            var authResult = app.AcquireTokenForClient(scopes).ExecuteAsync().Result;
+            var authResult = await app.AcquireTokenForClient(scopes).ExecuteAsync();
 
             if (authResult != null)
             {
@@ -451,13 +462,14 @@ namespace TestApp
                 var failUrl = "https://localhost:7021/category";
 
                 Console.WriteLine($"Calling {successUrl}");
-                string categoriesJson = client.GetStringAsync(successUrl).Result;
+                string categoriesJson = await client.GetStringAsync(successUrl);
                 Console.WriteLine($"Server response:\r\n{categoriesJson}");
 
                 //This should fail - we don't have manager permissions
                 var category = "{\r\n\t\"name\": \"post category\",\r\n\t\"image\": \"http://localhost/img.png\",\r\n\t\"parentCategory\": null\r\n}";
                 var content = new StringContent(category, Encoding.UTF8, "application/json");
-                var responseCode = client.PostAsync(failUrl, content).Result.StatusCode;
+                var response = await client.PostAsync(failUrl, content);
+                var responseCode = response.StatusCode;
                 if (responseCode == HttpStatusCode.Forbidden)
                 {
                     Console.WriteLine(
@@ -474,7 +486,7 @@ namespace TestApp
             }
         }
 
-        private static void TestCatalogManagerAuthorization()
+        private static async Task TestCatalogManagerAuthorization()
         {
             Console.WriteLine("Testing Manager access");
 
@@ -494,7 +506,7 @@ namespace TestApp
                 .WithAuthority(authority)
                 .WithClientSecret(clientSecret)
                 .Build();
-            var authResult = app.AcquireTokenForClient(scopes).ExecuteAsync().Result;
+            var authResult = await app.AcquireTokenForClient(scopes).ExecuteAsync();
 
             if (authResult != null)
             {
@@ -510,14 +522,14 @@ namespace TestApp
                 var category = "{\r\n\t\"name\": \"post category\",\r\n\t\"image\": \"http://localhost/img.png\",\r\n\t\"parentCategory\": null\r\n}";
                 var content = new StringContent(category, Encoding.UTF8, "application/json");
                 Console.WriteLine($"Calling {addCategoryUrl}");
-                var response = client.PostAsync(addCategoryUrl, content).Result;
+                var response = await client.PostAsync(addCategoryUrl, content);
 
                 Console.WriteLine(response.IsSuccessStatusCode
                     ? "Successfully added new category using Manager client app"
                     : "Failed to add new category from Manager client app");
 
                 Console.WriteLine($"Calling {getCategoriesUrl}");
-                var categoriesJson = client.GetStringAsync(getCategoriesUrl).Result;
+                var categoriesJson = await client.GetStringAsync(getCategoriesUrl);
                 Console.WriteLine($"Server response:\r\n{categoriesJson}");
             }
             else
@@ -526,15 +538,15 @@ namespace TestApp
             }
         }
 
-        private static void TestCatalogServiceAuthorization()
+        private static async Task TestCatalogServiceAuthorization()
         {
             Console.WriteLine("Testing Catalog Service authorization");
 
-            TestCatalogBuyerAuthorization();
-            TestCatalogManagerAuthorization();
+            await TestCatalogBuyerAuthorization();
+            await TestCatalogManagerAuthorization();
         }
 
-        private static void TestCartingCommonFlow(AuthenticationResult authResult)
+        private static async Task TestCartingCommonFlow(AuthenticationResult authResult)
         {
             Console.WriteLine("Access token: " + authResult.AccessToken);
 
@@ -549,7 +561,7 @@ namespace TestApp
 
             var requestContent = new StringContent(item, Encoding.UTF8, "application/json");
             Console.WriteLine($"Calling {addItemUrl}");
-            var addItemResponse = client.PostAsync(addItemUrl, requestContent).Result;
+            var addItemResponse = await client.PostAsync(addItemUrl, requestContent);
 
             if (addItemResponse.IsSuccessStatusCode)
             {
@@ -562,13 +574,13 @@ namespace TestApp
             }
 
             Console.WriteLine($"Calling {getCartUrl}");
-            var getCartResponse = client.GetAsync(getCartUrl).Result;
+            var getCartResponse = await client.GetAsync(getCartUrl);
             var responseCode = getCartResponse.StatusCode;
 
             if (responseCode is HttpStatusCode.OK or HttpStatusCode.NotFound)
             {
                 Console.WriteLine($"Successfully completed request to server, response code: {responseCode}");
-                var content = getCartResponse.Content.ReadAsStringAsync().Result;
+                var content = await getCartResponse.Content.ReadAsStringAsync();
                 Console.WriteLine($"Server response:\r\n{content}");
             }
             else
@@ -577,7 +589,7 @@ namespace TestApp
             }
         }
 
-        private static void TestCartingBuyerAuthorization()
+        private static async Task TestCartingBuyerAuthorization()
         {
             Console.WriteLine("Testing Buyer access");
 
@@ -597,7 +609,7 @@ namespace TestApp
                 .WithAuthority(authority)
                 .WithClientSecret(clientSecret)
                 .Build();
-            var authResult = app.AcquireTokenForClient(scopes).ExecuteAsync().Result;
+            var authResult = await app.AcquireTokenForClient(scopes).ExecuteAsync();
             
             if (authResult != null)
             {
@@ -609,7 +621,7 @@ namespace TestApp
             }
         }
 
-        private static void TestCartingManagerAuthorization()
+        private static async Task TestCartingManagerAuthorization()
         {
             Console.WriteLine("Testing Manager access");
 
@@ -629,7 +641,7 @@ namespace TestApp
                 .WithAuthority(authority)
                 .WithClientSecret(clientSecret)
                 .Build();
-            var authResult = app.AcquireTokenForClient(scopes).ExecuteAsync().Result;
+            var authResult = await app.AcquireTokenForClient(scopes).ExecuteAsync();
 
             if (authResult != null)
             {
@@ -641,12 +653,12 @@ namespace TestApp
             }
         }
 
-        private static void TestCartingServiceAuthorization()
+        private static async Task TestCartingServiceAuthorization()
         {
             Console.WriteLine("Testing Carting Service authorization");
 
-            TestCartingBuyerAuthorization();
-            TestCartingManagerAuthorization();
+            await TestCartingBuyerAuthorization();
+            await TestCartingManagerAuthorization();
         }
 
         private static async Task TestGrpcService()
