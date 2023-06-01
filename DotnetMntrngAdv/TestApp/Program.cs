@@ -29,8 +29,8 @@ namespace TestApp
             //TestCartingService().Wait();
             //TestCatalogService().Wait();
             //TestMessaging().Wait();
-            TestCatalogServiceAuthorization().Wait();
-            TestCartingServiceAuthorization().Wait();
+            //TestCatalogServiceAuthorization().Wait();
+            //TestCartingServiceAuthorization().Wait();
             TestGrpcService().Wait();
         }
 
@@ -672,13 +672,11 @@ namespace TestApp
 
         private static async Task TestGrpcService()
         {
-            //sample code from MSDN
-            
             using var channel = GrpcChannel.ForAddress("https://localhost:7081");
-            var client = new Greeter.GreeterClient(channel);
-            var reply = await client.SayHelloAsync(
-                new HelloRequest { Name = "GreeterClient" });
-            Console.WriteLine("Greeting: " + reply.Message);
+            var client = new Carting.CartingClient(channel);
+            var request = new GetItemsRequest {CartName = "cart123"};
+            var reply = await client.GetItemsAsync(request);
+
 
             //TODO
         }

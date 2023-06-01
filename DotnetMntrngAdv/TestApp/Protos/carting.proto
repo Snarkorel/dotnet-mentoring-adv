@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+option csharp_namespace = "TestApp";
+
+package carting;
+
+
+service Carting {
+  rpc GetItems (GetItemsRequest) returns (GetItemsReply);
+  rpc GetItemsStream (GetItemsRequest) returns (stream GetItemsReply);
+  rpc AddItem (stream AddItemRequest) returns (AddItemRequest);
+  rpc AddItemStream (stream AddItemRequest) returns (stream AddItemRequest);
+}
+
+message GetItemsRequest {
+	string cartName = 1;
+}
+
+message GetItemsReply {
+  repeated Item item = 1;
+}
+
+message AddItemRequest {
+	string cartName = 1;
+	repeated Item item = 2;
+}
+
+message AddItemReply {
+	repeated Item item = 1;
+}
+
+message Item {
+	int32 id = 1;
+	string name = 2;
+	string image = 3;
+	string price = 4;
+	int32 quantity = 5;
+}
