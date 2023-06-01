@@ -622,7 +622,7 @@ namespace TestApp
             
             if (authResult != null)
             {
-                TestCartingCommonFlow(authResult);
+                await TestCartingCommonFlow(authResult);
             }
             else
             {
@@ -654,7 +654,7 @@ namespace TestApp
 
             if (authResult != null)
             {
-                TestCartingCommonFlow(authResult);
+                await TestCartingCommonFlow(authResult);
             }
             else
             {
