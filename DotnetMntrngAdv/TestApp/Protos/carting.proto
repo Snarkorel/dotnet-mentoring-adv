@@ -8,8 +8,8 @@ package carting;
 service Carting {
   rpc GetItems (GetItemsRequest) returns (GetItemsReply);
   rpc GetItemsStream (GetItemsRequest) returns (stream GetItemsReply);
-  rpc AddItem (stream AddItemRequest) returns (AddItemRequest);
-  rpc AddItemStream (stream AddItemRequest) returns (stream AddItemRequest);
+  rpc AddItem (stream AddItemRequest) returns (AddItemReply);
+  rpc AddItemStream (stream AddItemRequest) returns (stream AddItemReply);
 }
 
 message GetItemsRequest {
