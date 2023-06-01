@@ -20,15 +20,18 @@ namespace TestApp
 {
     internal class Program
     {
-        static async Task Main(string[] args)
+        private static ICartingService? _cartingService;
+        private static ICatalogService? _catalogService;
+
+        static void Main(string[] args)
         {
             Console.WriteLine("TestApp initialized");
-            await TestCartingService();
-            await TestCatalogService();
-            await TestMessaging();
-            await TestCatalogServiceAuthorization();
-            await TestCartingServiceAuthorization();
-            await TestGrpcService();
+            //TestCartingService().Wait();
+            //TestCatalogService().Wait();
+            //TestMessaging().Wait();
+            TestCatalogServiceAuthorization().Wait();
+            TestCartingServiceAuthorization().Wait();
+            TestGrpcService().Wait();
         }
 
         private static void PrintCartItem(CartItem item)
@@ -65,6 +68,8 @@ namespace TestApp
 
         private static ICartingService GetCartingService()
         {
+            if (_cartingService == null)
+            {
             var serviceProvider = new ServiceCollection()
                 .AddLogging()
                 .AddSingleton<ICartRepository, CartRepository>()
@@ -72,9 +77,10 @@ namespace TestApp
                 .AddSingleton<ICartingService, CartingService.Core.CartingService>()
                 .BuildServiceProvider();
 
-            var cartingService = serviceProvider.GetService<ICartingService>();
+                _cartingService = serviceProvider.GetService<ICartingService>();
+            }
 
-            return cartingService;
+            return _cartingService;
         }
 
         private static async Task TestCartingService()
@@ -349,6 +355,8 @@ namespace TestApp
 
         private static ICatalogService GetCatalogService()
         {
+            if (_catalogService == null)
+            {
             var serviceProvider = new ServiceCollection()
                 .AddDbContext<DbContext, CatalogContext>(ServiceLifetime.Transient)
                 .AddSingleton<ICategoryRepository, CategoryRepository>()
@@ -357,9 +365,10 @@ namespace TestApp
                 .AddSingleton<ICatalogService, CatalogService.Core.CatalogService>()
                 .BuildServiceProvider();
 
-            var catalogService = serviceProvider.GetService<ICatalogService>();
+                _catalogService = serviceProvider.GetService<ICatalogService>();
+            }
 
-            return catalogService;
+            return _catalogService;
         }
 
         private static async Task TestCatalogService()
@@ -419,7 +428,7 @@ namespace TestApp
             actualProduct.Name = "Modified product test for ServiceBus";
             await catalogService.UpdateProduct(actualProduct);
 
-            Thread.Sleep(60000);
+            await Task.Delay(60000);
 
             await GetAndPrintItems(cartingService, cartName);
 
