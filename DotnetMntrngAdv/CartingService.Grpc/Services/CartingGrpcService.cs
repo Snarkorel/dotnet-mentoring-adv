@@ -59,7 +59,7 @@ namespace CartingService.Grpc.Services
             var cartName = string.Empty;
             _logger.Log(LogLevel.Information, "Started AddItem client streaming request");
             
-            while (await requestStream.MoveNext())
+            while (await requestStream.MoveNext() && !context.CancellationToken.IsCancellationRequested)
             {
                 var message = requestStream.Current;
                 _logger.Log(LogLevel.Information, $"Processing AddItemRequest message: {message}");
