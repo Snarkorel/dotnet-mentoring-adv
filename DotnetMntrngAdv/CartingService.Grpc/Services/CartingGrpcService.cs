@@ -108,6 +108,13 @@ namespace CartingService.Grpc.Services
             
             while (!readTask.IsCompleted)
             {
+                //For case, when no requests were processed
+                if (cartName == string.Empty)
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(1), context.CancellationToken);
+                    continue;
+                }
+
                 var items = await GetAndConvertCartItems(cartName);
                 var response = new AddItemReply();
                 response.Item.AddRange(items);
