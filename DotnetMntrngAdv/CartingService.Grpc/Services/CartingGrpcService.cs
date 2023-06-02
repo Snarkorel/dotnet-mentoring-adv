@@ -1,7 +1,7 @@
 using Grpc.Core;
-using System.Globalization;
 using CartingService.Core.Entities;
 using CartingService.Core.Interfaces;
+using CartingService.Grpc.Utils;
 using Google.Protobuf.Collections;
 
 namespace CartingService.Grpc.Services
@@ -43,7 +43,7 @@ namespace CartingService.Grpc.Services
                     return;
 
                 var response = new GetItemsReply();
-                response.Item.Add(ConvertToItem(item));
+                response.Item.Add(item.ToItem());
 
                 _logger.Log(LogLevel.Information, $"Sending GetItemsReply: {response}");
                 await responseStream.WriteAsync(response);
@@ -70,7 +70,7 @@ namespace CartingService.Grpc.Services
                 var requestItems = message.Item;
                 foreach (var item in requestItems)
                 {
-                    var cartItem = ConvertToCartItem(item);
+                    var cartItem = item.ToCartItem();
                     await _cartingService.AddItem(cartName, cartItem);
                 }
                 
@@ -101,7 +101,7 @@ namespace CartingService.Grpc.Services
                             cartName = message.CartName;
 
                         _logger.Log(LogLevel.Information, $"Processing AddItemRequest message: {message}");
-                        await _cartingService.AddItem(message.CartName, ConvertToCartItem(item));
+                        await _cartingService.AddItem(message.CartName, item.ToCartItem());
                     }
                 }
             });
@@ -119,47 +119,7 @@ namespace CartingService.Grpc.Services
 
             _logger.Log(LogLevel.Information, "Completed AddItem bidirectional streaming request");
         }
-
-        private static decimal GetDecimal(string value)
-        {
-            return decimal.Parse(value, CultureInfo.InvariantCulture);
-        }
-
-        private static RepeatedField<Item> ConvertItems(IEnumerable<CartItem> items)
-        {
-            var convertedItems = new RepeatedField<Item>();
-            foreach (var item in items)
-            {
-                convertedItems.Add(ConvertToItem(item));
-            }
-
-            return convertedItems;
-        }
-
-        private static Item ConvertToItem(CartItem item)
-        {
-            return new Item
-            {
-                Id = item.Id,
-                Image = item.Image.ToString(),
-                Name = item.Name,
-                Price = item.Price.ToString(CultureInfo.InvariantCulture),
-                Quantity = item.Quantity,
-            };
-        }
-
-        private static CartItem ConvertToCartItem(Item item)
-        {
-            return new CartItem
-            {
-                Id = item.Id,
-                Image = new Uri(item.Image),
-                Name = item.Name,
-                Price = GetDecimal(item.Price),
-                Quantity = item.Quantity
-            };
-        }
-
+        
         private async Task<IEnumerable<CartItem>> GetCartItems(string cartName)
         {
             var cart = await _cartingService.GetCartInfo(cartName);
@@ -169,7 +129,7 @@ namespace CartingService.Grpc.Services
         private async Task<RepeatedField<Item>> GetAndConvertCartItems(string cartName)
         {
             var items = await GetCartItems(cartName);
-            return ConvertItems(items);
+            return GrpcConverter.ConvertItems(items);
         }
     }
 }
