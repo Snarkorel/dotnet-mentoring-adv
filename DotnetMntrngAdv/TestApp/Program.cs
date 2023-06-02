@@ -14,6 +14,8 @@ using Microsoft.Identity.Client;
 using System.Net.Http.Headers;
 using System.Net;
 using System.Text;
+using Google.Protobuf.Collections;
+using Grpc.Core;
 using Grpc.Net.Client;
 
 namespace TestApp
@@ -672,13 +674,112 @@ namespace TestApp
 
         private static async Task TestGrpcService()
         {
-            using var channel = GrpcChannel.ForAddress("https://localhost:7081");
+            const string CartName = "grpc_cart";
+            
+            using var channel = GrpcChannel.ForAddress("http://localhost:5214");
             var client = new Carting.CartingClient(channel);
-            var request = new GetItemsRequest {CartName = "cart123"};
-            var reply = await client.GetItemsAsync(request);
+
+            Console.WriteLine("Starting gRPC service test");
+
+            //Add item (client streaming)
+            Console.WriteLine("Sending AddItem client streaming request");
+            var cancellationToken = new CancellationTokenSource().Token;
+            using var addItemCall = client.AddItem(cancellationToken: cancellationToken);
+            var itemsToAdd = new RepeatedField<Item>
+            {
+                new Item
+                {
+                    Id = 1,
+                    Image = "http://localhost/grpc.png",
+                    Name = "gRPC test item",
+                    Price = "125.75",
+                    Quantity = 3
+                }
+            };
+
+            foreach (var item in itemsToAdd)
+            {
+                var request = new AddItemRequest { CartName = CartName };
+                request.Item.Add(item);
+                await addItemCall.RequestStream.WriteAsync(request, cancellationToken);
+            }
+            await addItemCall.RequestStream.CompleteAsync();
+            var addItemsResponse = await addItemCall;
+            Console.WriteLine($"AddItem (client streaming) response:\r\n{addItemsResponse}");
 
 
-            //TODO
+            //Get items (unary call)
+            Console.WriteLine("Sending GetItems unary request");
+            var getItemsRequest = new GetItemsRequest { CartName = CartName };
+            var getItemsReply = await client.GetItemsAsync(getItemsRequest);
+            Console.WriteLine($"GetItems (server streaming) response:\r\n{getItemsReply}");
+
+            //Add items (bi-directional streaming)
+            cancellationToken = new CancellationTokenSource().Token;
+            itemsToAdd = new RepeatedField<Item>
+            {
+                new Item
+                {
+                    Id = 2,
+                    Image = "http://localhost/grpc2.png",
+                    Name = "gRPC test item",
+                    Price = "200.00",
+                    Quantity = 2
+                },
+                new Item
+                {
+                    Id = 3,
+                    Image = "http://localhost/grpc3.png",
+                    Name = "gRPC test item",
+                    Price = "300.00",
+                    Quantity = 3
+                },
+                new Item
+                {
+                    Id = 4,
+                    Image = "http://localhost/grpc4.png",
+                    Name = "gRPC test item",
+                    Price = "400.00",
+                    Quantity = 4
+                }
+            };
+            using var addItemBidirectionalCall = client.AddItemStream(cancellationToken: cancellationToken);
+
+            Console.WriteLine("Starting background task to receive AddItem messages");
+            var readTask = Task.Run(async () =>
+            {
+                await foreach (var addItemResponse in addItemBidirectionalCall.ResponseStream.ReadAllAsync(cancellationToken))
+                {
+                    Console.WriteLine($"Got AddItemReply: {addItemResponse}");
+                }
+            }, cancellationToken);
+
+            Console.WriteLine("Sending AddItem bi-directional streaming request");
+            foreach (var item in itemsToAdd)
+            {
+                var request = new AddItemRequest { CartName = CartName };
+                request.Item.Add(item);
+                await addItemBidirectionalCall.RequestStream.WriteAsync(request, cancellationToken);
+            }
+
+            Console.WriteLine("Completing AddItem bi-directional streaming request");
+            await addItemBidirectionalCall.RequestStream.CompleteAsync();
+            await readTask;
+
+            //Get items (server streaming)
+            Console.WriteLine("Sending GetItems server streaming request");
+            cancellationToken = new CancellationTokenSource().Token;
+            var getItemsStreamRequest = new GetItemsRequest { CartName = CartName };
+            using var getItemsStreamCall = client.GetItemsStream(getItemsStreamRequest, cancellationToken: cancellationToken);
+
+            while (await getItemsStreamCall.ResponseStream.MoveNext())
+            {
+                var reply = getItemsStreamCall.ResponseStream.Current;
+                Console.WriteLine($"Got streaming reply: {reply}");
+            }
+            Console.WriteLine("GetItems server streaming request completed");
+
+            Console.WriteLine("gRPC service test completed");
         }
     }
 }
