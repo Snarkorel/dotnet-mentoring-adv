@@ -16,23 +16,25 @@ namespace CartingService.Grpc.Services
             _cartingService = cartingService;
         }
 
-        //TODO: logging (also setup loglevel in configs or startup class), cancellation tokens
         //TODO: handle service exceptions
 
         //Unary call
         public override async Task<GetItemsReply> GetItems(GetItemsRequest request, ServerCallContext context)
         {
+            _logger.Log(LogLevel.Information, "Acquired GetItems unary request");
             var convertedItems = await GetAndConvertCartItems(request.CartName);
 
             var response = new GetItemsReply();
             response.Item.AddRange(convertedItems);
 
+            _logger.Log(LogLevel.Information, "Completed GetItems unary request");
             return response;
         }
 
         //Server streaming
         public override async Task GetItemsStream(GetItemsRequest request, IServerStreamWriter<GetItemsReply> responseStream, ServerCallContext context)
         {
+            _logger.Log(LogLevel.Information, "Started GetItems server streaming request");
             var items = await GetCartItems(request.CartName);
 
             foreach (var item in items)
@@ -42,18 +44,25 @@ namespace CartingService.Grpc.Services
 
                 var response = new GetItemsReply();
                 response.Item.Add(ConvertToItem(item));
+
+                _logger.Log(LogLevel.Information, $"Sending GetItemsReply: {response}");
                 await responseStream.WriteAsync(response);
                 await Task.Delay(TimeSpan.FromSeconds(1), context.CancellationToken);
             }
+
+            _logger.Log(LogLevel.Information, "Completed GetItems server streaming request");
         }
         
         //Client streaming
         public override async Task<AddItemReply> AddItem(IAsyncStreamReader<AddItemRequest> requestStream, ServerCallContext context)
         {
             var cartName = string.Empty;
+            _logger.Log(LogLevel.Information, "Started AddItem client streaming request");
+            
             while (await requestStream.MoveNext())
             {
                 var message = requestStream.Current;
+                _logger.Log(LogLevel.Information, $"Processing AddItemRequest message: {message}");
 
                 if (cartName == string.Empty)
                     cartName = message.CartName;
@@ -71,6 +80,7 @@ namespace CartingService.Grpc.Services
             var response = new AddItemReply();
             response.Item.AddRange(items);
 
+            _logger.Log(LogLevel.Information, "Completed AddItem client streaming request");
             return response;
         }
 
@@ -79,7 +89,8 @@ namespace CartingService.Grpc.Services
         public override async Task AddItemStream(IAsyncStreamReader<AddItemRequest> requestStream, IServerStreamWriter<AddItemReply> responseStream, ServerCallContext context)
         {
             var cartName = string.Empty;
-            
+            _logger.Log(LogLevel.Information, "Started AddItem bidirectional streaming request");
+
             var readTask = Task.Run(async () =>
             {
                 await foreach (var message in requestStream.ReadAllAsync())
@@ -88,6 +99,8 @@ namespace CartingService.Grpc.Services
                     {
                         if (cartName == string.Empty)
                             cartName = message.CartName;
+
+                        _logger.Log(LogLevel.Information, $"Processing AddItemRequest message: {message}");
                         await _cartingService.AddItem(message.CartName, ConvertToCartItem(item));
                     }
                 }
@@ -99,9 +112,12 @@ namespace CartingService.Grpc.Services
                 var response = new AddItemReply();
                 response.Item.AddRange(items);
 
+                _logger.Log(LogLevel.Information, $"Sending AddItemReply message: {response}");
                 await responseStream.WriteAsync(response);
                 await Task.Delay(TimeSpan.FromSeconds(1), context.CancellationToken);
             }
+
+            _logger.Log(LogLevel.Information, "Completed AddItem bidirectional streaming request");
         }
 
         private static decimal GetDecimal(string value)
