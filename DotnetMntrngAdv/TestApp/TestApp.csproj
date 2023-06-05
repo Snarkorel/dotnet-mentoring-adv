@@ -8,6 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.23.2" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.53.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.54.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.4" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
   </ItemGroup>
@@ -16,6 +22,10 @@
     <ProjectReference Include="..\CartingService\CartingService.csproj" />
     <ProjectReference Include="..\CatalogService.Core\CatalogService.Core.csproj" />
     <ProjectReference Include="..\CatalogService.Data\CatalogService.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="Protos\carting.proto" GrpcServices="Client" />
   </ItemGroup>
 
 </Project>
