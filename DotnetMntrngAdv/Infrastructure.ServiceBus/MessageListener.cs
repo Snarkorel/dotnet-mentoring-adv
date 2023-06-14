@@ -2,6 +2,7 @@
 using Azure.Messaging.ServiceBus;
 using Infrastructure.ServiceBus.DTO;
 using Infrastructure.ServiceBus.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.ServiceBus
 {
@@ -9,9 +10,11 @@ namespace Infrastructure.ServiceBus
     {
         private readonly ServiceBusProcessor _processor;
         private Action<ItemDto> _callback;
+        private readonly ILogger<MessageListener> _logger;
 
-        public MessageListener()
+        public MessageListener(ILogger<MessageListener> logger)
         {
+            _logger = logger;
             _processor = Client.CreateProcessor(QueueName);
         }
         
@@ -20,12 +23,14 @@ namespace Infrastructure.ServiceBus
             _callback = handler;
             _processor.ProcessMessageAsync += MessageHandler;
             _processor.ProcessErrorAsync += ErrorHandler;
+            _logger.LogInformation("Service Bus message listener initialized, staring subscription");
             await _processor.StartProcessingAsync();
         }
 
         async Task MessageHandler(ProcessMessageEventArgs args)
         {
             var payload = args.Message.Body.ToString();
+            _logger.LogInformation($"Got a message from Service Bus, payload: {payload}");
 
             //TODO: error processing
             var dto = JsonSerializer.Deserialize<ItemDto>(payload);
@@ -36,10 +41,8 @@ namespace Infrastructure.ServiceBus
 
         Task ErrorHandler(ProcessErrorEventArgs args)
         {
-            //TODO: error logging and processing
-            Console.WriteLine(args.ErrorSource);
-            Console.WriteLine(args.EntityPath);
-            Console.WriteLine(args.Exception.ToString());
+            //TODO: error processing
+            _logger.LogError(args.Exception, $"An error occurred while processing incoming message [ErrorSource = {args.ErrorSource}, EntityPath = {args.EntityPath}]");
             return Task.CompletedTask;
         }
     }
