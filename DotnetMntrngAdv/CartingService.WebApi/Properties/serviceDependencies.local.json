@@ -1,9 +1,5 @@
 {
   "dependencies": {
-    "identityapp1": {
-      "type": "identityapp.default",
-      "dynamicId": null
-    },
     "secrets1": {
       "type": "secrets.user"
     },
@@ -11,7 +7,7 @@
       "secretStore": "LocalSecretsFile",
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/microsoft.insights/components/DistributedLogger",
       "type": "appInsights.azure",
-      "connectionId": "APPINSIGHTS_CONNECTION_STRING",
+      "connectionId": "APPLICATIONINSIGHTS_CONNECTION_STRING",
       "dynamicId": null
     }
   }

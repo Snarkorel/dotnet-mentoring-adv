@@ -4,9 +4,12 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationInsightsResourceId>/subscriptions/d0a8b26c-d199-4695-a1aa-0037862b9427/resourceGroups/DotnetMentoringAdvanced/providers/microsoft.insights/components/DistributedLogger</ApplicationInsightsResourceId>
+    <UserSecretsId>74013bd7-5b6e-45cc-a33e-734384f8a503</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.15.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.4" />
     <PackageReference Include="Microsoft.Identity.Web" Version="2.11.0" />

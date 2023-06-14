@@ -21,10 +21,11 @@ namespace CartingService.Grpc
                 .AddGrpc();
             
             builder.Services
+                .AddApplicationInsightsTelemetry()
                 .AddSingleton<ICartRepository, CartRepository>()
                 .AddSingleton<IMessageListener, MessageListener>()
                 .AddSingleton<ICartingService, Core.CartingService>();
-
+            
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

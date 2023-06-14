@@ -28,6 +28,7 @@ namespace CatalogService.WebApi
 
             builder.Services
                 .AddLogging()
+                .AddApplicationInsightsTelemetry()
                 .AddAuthorization();
 
             builder.Services

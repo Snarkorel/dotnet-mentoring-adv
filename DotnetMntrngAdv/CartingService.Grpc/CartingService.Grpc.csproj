@@ -4,6 +4,8 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationInsightsResourceId>/subscriptions/d0a8b26c-d199-4695-a1aa-0037862b9427/resourceGroups/DotnetMentoringAdvanced/providers/microsoft.insights/components/DistributedLogger</ApplicationInsightsResourceId>
+    <UserSecretsId>d7ebb0c3-5df7-4f2b-a839-54fbb95b5fcd</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" Version="2.49.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.15.0" />
   </ItemGroup>
 
   <ItemGroup>
