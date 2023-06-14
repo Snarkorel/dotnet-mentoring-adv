@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="LiteDB" Version="5.0.16" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
