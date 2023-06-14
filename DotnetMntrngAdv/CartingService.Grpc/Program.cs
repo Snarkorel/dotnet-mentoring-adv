@@ -17,6 +17,7 @@ namespace CartingService.Grpc
 
             // Add services to the container.
             builder.Services
+                .AddLogging()
                 .AddGrpc();
             
             builder.Services

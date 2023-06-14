@@ -26,7 +26,9 @@ namespace CatalogService.WebApi
                     JwtBearerDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
-            builder.Services.AddAuthorization();
+            builder.Services
+                .AddLogging()
+                .AddAuthorization();
 
             builder.Services
                 .AddDbContext<DbContext, CatalogContext>(ServiceLifetime.Transient)
