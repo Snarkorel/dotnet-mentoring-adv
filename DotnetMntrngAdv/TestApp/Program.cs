@@ -30,9 +30,9 @@ namespace TestApp
             Console.WriteLine("TestApp initialized");
             //TestCartingService().Wait();
             //TestCatalogService().Wait();
-            //TestMessaging().Wait();
-            //TestCatalogServiceAuthorization().Wait();
-            //TestCartingServiceAuthorization().Wait();
+            TestMessaging().Wait();
+            TestCatalogServiceAuthorization().Wait();
+            TestCartingServiceAuthorization().Wait();
             TestGrpcService().Wait();
         }
 
