@@ -10,9 +10,9 @@ namespace Infrastructure.ServiceBus
     {
         private readonly ServiceBusProcessor _processor;
         private Action<ItemDto> _callback;
-        private readonly ILogger<MessageListener> _logger;
+        private readonly ILogger<IMessageListener> _logger;
 
-        public MessageListener(ILogger<MessageListener> logger)
+        public MessageListener(ILogger<IMessageListener> logger)
         {
             _logger = logger;
             _processor = Client.CreateProcessor(QueueName);

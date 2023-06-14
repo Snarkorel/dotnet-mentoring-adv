@@ -9,9 +9,9 @@ namespace Infrastructure.ServiceBus
     public class MessagePublisher : MessagingClient, IMessagePublisher
     {
         private readonly ServiceBusSender _sender;
-        private readonly ILogger<MessagePublisher> _logger;
+        private readonly ILogger<IMessagePublisher> _logger;
 
-        public MessagePublisher(ILogger<MessagePublisher> logger)
+        public MessagePublisher(ILogger<IMessagePublisher> logger)
         {
             _logger = logger;
             _sender = Client.CreateSender(QueueName);
