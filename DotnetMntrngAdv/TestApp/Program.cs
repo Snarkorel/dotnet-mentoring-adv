@@ -30,9 +30,9 @@ namespace TestApp
             Console.WriteLine("TestApp initialized");
             //TestCartingService().Wait();
             //TestCatalogService().Wait();
-            //TestMessaging().Wait();
-            //TestCatalogServiceAuthorization().Wait();
-            //TestCartingServiceAuthorization().Wait();
+            TestMessaging().Wait();
+            TestCatalogServiceAuthorization().Wait();
+            TestCartingServiceAuthorization().Wait();
             TestGrpcService().Wait();
         }
 
@@ -360,6 +360,7 @@ namespace TestApp
             if (_catalogService == null)
             {
             var serviceProvider = new ServiceCollection()
+                    .AddLogging()
                 .AddDbContext<DbContext, CatalogContext>(ServiceLifetime.Transient)
                 .AddSingleton<ICategoryRepository, CategoryRepository>()
                 .AddSingleton<IProductRepository, ProductRepository>()

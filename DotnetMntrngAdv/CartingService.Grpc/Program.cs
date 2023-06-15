@@ -17,13 +17,15 @@ namespace CartingService.Grpc
 
             // Add services to the container.
             builder.Services
+                .AddLogging()
                 .AddGrpc();
             
             builder.Services
+                .AddApplicationInsightsTelemetry()
                 .AddSingleton<ICartRepository, CartRepository>()
                 .AddSingleton<IMessageListener, MessageListener>()
                 .AddSingleton<ICartingService, Core.CartingService>();
-
+            
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

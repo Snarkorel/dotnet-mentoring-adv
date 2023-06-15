@@ -29,6 +29,7 @@ namespace CartingService.WebApi
 
             builder.Services
                 .AddLogging()
+                .AddApplicationInsightsTelemetry()
                 .AddEndpointsApiExplorer()
                 .AddSwaggerGen(c =>
                 {
